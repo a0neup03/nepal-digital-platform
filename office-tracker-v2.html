@@ -1,0 +1,1108 @@
+<!DOCTYPE html>
+<html lang="ne">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nepal Office Tracker | नेपाल कार्यालय ट्रयाकर</title>
+    
+    <!-- Fonts and Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary-color: #8b5cf6;
+            --accent-color: #f59e0b;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --info-color: #3b82f6;
+            
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8fafc;
+            --bg-tertiary: #f1f5f9;
+            --bg-card: #ffffff;
+            
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --text-muted: #94a3b8;
+            --text-light: #cbd5e1;
+            
+            --border-color: #e2e8f0;
+            --border-focus: #6366f1;
+            
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+            
+            --radius-sm: 0.375rem;
+            --radius-md: 0.5rem;
+            --radius-lg: 0.75rem;
+            --radius-xl: 1rem;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Noto Sans Devanagari', 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: white;
+        }
+        
+        .header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .header .subtitle {
+            font-size: 1rem;
+            opacity: 0.9;
+            font-weight: 400;
+            margin-bottom: 1rem;
+        }
+        
+        .empathy-message {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            color: white;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .empathy-message .icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .tracker-container {
+            background: var(--bg-card);
+            border-radius: var(--radius-xl);
+            padding: 2rem;
+            box-shadow: var(--shadow-xl);
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .tracker-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+        }
+        
+        .step {
+            display: none;
+            animation: slideIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        
+        .step.active {
+            display: block;
+        }
+        
+        @keyframes slideIn {
+            from { 
+                opacity: 0; 
+                transform: translateX(30px);
+            }
+            to { 
+                opacity: 1; 
+                transform: translateX(0);
+            }
+        }
+        
+        .step-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .step-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border-radius: 50%;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+        
+        .step-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .step-description {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        
+        .quick-select {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .quick-option {
+            padding: 1.5rem;
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            background: var(--bg-secondary);
+        }
+        
+        .quick-option:hover {
+            border-color: var(--primary-color);
+            background: var(--bg-primary);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .quick-option.selected {
+            border-color: var(--primary-color);
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .quick-option .icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+        
+        .quick-option .title {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+        
+        .quick-option .subtitle {
+            font-size: 0.875rem;
+            opacity: 0.8;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-label {
+            display: block;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+        }
+        
+        .form-select, .form-input, .form-textarea {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: var(--bg-primary);
+            font-family: inherit;
+        }
+        
+        .form-select:focus, .form-input:focus, .form-textarea:focus {
+            outline: none;
+            border-color: var(--border-focus);
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+        }
+        
+        .form-textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+        
+        .timer-section {
+            text-align: center;
+            margin: 2rem 0;
+        }
+        
+        .timer-display {
+            padding: 3rem 2rem;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: var(--radius-xl);
+            color: white;
+            margin-bottom: 2rem;
+        }
+        
+        .timer-time {
+            font-size: 4rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            font-feature-settings: "tnum";
+        }
+        
+        .timer-label {
+            font-size: 1.125rem;
+            opacity: 0.9;
+        }
+        
+        .timer-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+        
+        .mood-selection {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+        
+        .mood-option {
+            padding: 1.5rem 1rem;
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            background: var(--bg-secondary);
+        }
+        
+        .mood-option:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+        }
+        
+        .mood-option.selected {
+            border-color: var(--primary-color);
+            background: var(--primary-color);
+            color: white;
+        }
+        
+        .mood-option .emoji {
+            font-size: 2rem;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+        
+        .mood-option .label {
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        
+        .rating-grid {
+            display: grid;
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+        
+        .rating-item {
+            padding: 1.5rem;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            background: var(--bg-secondary);
+        }
+        
+        .rating-question {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+        
+        .star-rating {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+            margin-bottom: 1rem;
+        }
+        
+        .star {
+            font-size: 2rem;
+            color: var(--text-light);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .star:hover,
+        .star.active {
+            color: #fbbf24;
+            transform: scale(1.1);
+        }
+        
+        .yes-no-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+        
+        .yes-no-btn {
+            flex: 1;
+            max-width: 150px;
+            padding: 1rem;
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            background: var(--bg-primary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            font-weight: 500;
+        }
+        
+        .yes-no-btn:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+        }
+        
+        .yes-no-btn.selected {
+            border-color: var(--primary-color);
+            background: var(--primary-color);
+            color: white;
+        }
+        
+        .yes-no-btn.danger.selected {
+            border-color: var(--danger-color);
+            background: var(--danger-color);
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 3rem;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: var(--radius-lg);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            min-width: 140px;
+            justify-content: center;
+            font-family: inherit;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .btn-secondary {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border: 2px solid var(--border-color);
+        }
+        
+        .btn-secondary:hover {
+            border-color: var(--primary-color);
+            background: var(--bg-primary);
+        }
+        
+        .btn-success {
+            background: var(--success-color);
+            color: white;
+        }
+        
+        .btn-warning {
+            background: var(--warning-color);
+            color: white;
+        }
+        
+        .btn-danger {
+            background: var(--danger-color);
+            color: white;
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+        
+        .progress-indicator {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .progress-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--text-light);
+            transition: all 0.3s ease;
+        }
+        
+        .progress-dot.active {
+            background: var(--primary-color);
+            transform: scale(1.2);
+        }
+        
+        .progress-dot.completed {
+            background: var(--success-color);
+        }
+        
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            margin-bottom: 1rem;
+            transition: color 0.3s ease;
+            font-size: 0.9rem;
+        }
+        
+        .back-link:hover {
+            color: white;
+        }
+        
+        .back-link i {
+            margin-right: 0.5rem;
+        }
+        
+        .success-animation {
+            text-align: center;
+            padding: 3rem 2rem;
+        }
+        
+        .success-icon {
+            font-size: 5rem;
+            color: var(--success-color);
+            margin-bottom: 1rem;
+            animation: bounce 1s ease-in-out;
+        }
+        
+        @keyframes bounce {
+            0%, 20%, 60%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-20px); }
+            80% { transform: translateY(-10px); }
+        }
+        
+        .skip-option {
+            text-align: center;
+            margin-top: 1rem;
+        }
+        
+        .skip-link {
+            color: var(--text-muted);
+            text-decoration: underline;
+            cursor: pointer;
+            font-size: 0.875rem;
+        }
+        
+        .skip-link:hover {
+            color: var(--text-secondary);
+        }
+        
+        .help-text {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            margin-top: 0.5rem;
+            text-align: center;
+        }
+        
+        .encouragement {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            padding: 1rem;
+            border-radius: var(--radius-lg);
+            text-align: center;
+            margin: 1rem 0;
+            font-weight: 500;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 0.5rem;
+            }
+            
+            .tracker-container {
+                padding: 1.5rem;
+                margin: 1rem 0;
+            }
+            
+            .header h1 {
+                font-size: 1.75rem;
+            }
+            
+            .timer-time {
+                font-size: 3rem;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .btn {
+                width: 100%;
+                max-width: 300px;
+            }
+            
+            .quick-select {
+                grid-template-columns: 1fr;
+            }
+            
+            .mood-selection {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="unified-nepal-platform.html" class="back-link">
+            <i class="fas fa-arrow-left"></i>
+            मुख्य पृष्ठमा फर्कनुहोस्
+        </a>
+        
+        <div class="header">
+            <h1>🏛️ Nepal Office Tracker</h1>
+            <p class="subtitle">तपाईंको अनुभव साझा गर्नुहोस् - एकसाथ सुधार गरौं</p>
+        </div>
+        
+        <div class="empathy-message">
+            <div class="icon">🤗</div>
+            <p><strong>हामी बुझ्छौं</strong> - सरकारी कार्यालयमा जानु कहिलेकाहीं निराशाजनक हुन्छ।<br>
+            तपाईंको अनुभवले अरूलाई मद्दत गर्नेछ र सेवा सुधार गर्नेछ।</p>
+        </div>
+        
+        <div class="tracker-container">
+            <div class="progress-indicator">
+                <div class="progress-dot active" id="dot1"></div>
+                <div class="progress-dot" id="dot2"></div>
+                <div class="progress-dot" id="dot3"></div>
+                <div class="progress-dot" id="dot4"></div>
+                <div class="progress-dot" id="dot5"></div>
+            </div>
+            
+            <!-- Step 1: Quick Start -->
+            <div class="step active" id="step1">
+                <div class="step-header">
+                    <div class="step-number">1</div>
+                    <h2 class="step-title">कहाँ जानुभयो?</h2>
+                    <p class="step-description">सबैभन्दा सामान्य ठाउँहरू छनोट गर्नुहोस्</p>
+                </div>
+                
+                <div class="quick-select" id="locationSelect">
+                    <div class="quick-option" data-location="kathmandu-admin">
+                        <span class="icon">🏛️</span>
+                        <div class="title">काठमाडौं</div>
+                        <div class="subtitle">जिल्ला प्रशासन</div>
+                    </div>
+                    <div class="quick-option" data-location="kathmandu-passport">
+                        <span class="icon">📘</span>
+                        <div class="title">काठमाडौं</div>
+                        <div class="subtitle">राहदानी कार्यालय</div>
+                    </div>
+                    <div class="quick-option" data-location="lalitpur-admin">
+                        <span class="icon">🏛️</span>
+                        <div class="title">ललितपुर</div>
+                        <div class="subtitle">जिल्ला प्रशासन</div>
+                    </div>
+                    <div class="quick-option" data-location="bhaktapur-admin">
+                        <span class="icon">🏛️</span>
+                        <div class="title">भक्तपुर</div>
+                        <div class="subtitle">जिल्ला प्रशासन</div>
+                    </div>
+                    <div class="quick-option" data-location="transport-bagmati">
+                        <span class="icon">🚗</span>
+                        <div class="title">यातायात</div>
+                        <div class="subtitle">बागमती प्रदेश</div>
+                    </div>
+                    <div class="quick-option" data-location="other">
+                        <span class="icon">📍</span>
+                        <div class="title">अन्य ठाउँ</div>
+                        <div class="subtitle">फरक कार्यालय</div>
+                    </div>
+                </div>
+                
+                <div class="action-buttons">
+                    <button class="btn btn-primary" onclick="nextStep()" id="step1Next" disabled>
+                        अर्को चरण <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+                
+                <div class="skip-option">
+                    <span class="skip-link" onclick="showDetailedForm()">
+                        विस्तृत विकल्प चाहिन्छ? यहाँ थिच्नुहोस्
+                    </span>
+                </div>
+            </div>
+            
+            <!-- Step 2: Service Type -->
+            <div class="step" id="step2">
+                <div class="step-header">
+                    <div class="step-number">2</div>
+                    <h2 class="step-title">के काम गर्न जानुभयो?</h2>
+                    <p class="step-description">सबैभन्दा सामान्य सेवाहरू</p>
+                </div>
+                
+                <div class="quick-select" id="serviceSelect">
+                    <div class="quick-option" data-service="citizenship">
+                        <span class="icon">🆔</span>
+                        <div class="title">नागरिकता</div>
+                        <div class="subtitle">नयाँ/नवीकरण</div>
+                    </div>
+                    <div class="quick-option" data-service="passport">
+                        <span class="icon">📘</span>
+                        <div class="title">राहदानी</div>
+                        <div class="subtitle">नयाँ/नवीकरण</div>
+                    </div>
+                    <div class="quick-option" data-service="license">
+                        <span class="icon">🚗</span>
+                        <div class="title">लाइसेन्स</div>
+                        <div class="subtitle">सवारी अनुमति</div>
+                    </div>
+                    <div class="quick-option" data-service="certificate">
+                        <span class="icon">📜</span>
+                        <div class="title">प्रमाणपत्र</div>
+                        <div class="subtitle">जन्म/विवाह</div>
+                    </div>
+                    <div class="quick-option" data-service="land">
+                        <span class="icon">🏞️</span>
+                        <div class="title">जग्गा दर्ता</div>
+                        <div class="subtitle">मालपोत कामकाज</div>
+                    </div>
+                    <div class="quick-option" data-service="other">
+                        <span class="icon">📋</span>
+                        <div class="title">अन्य सेवा</div>
+                        <div class="subtitle">फरक काम</div>
+                    </div>
+                </div>
+                
+                <div class="action-buttons">
+                    <button class="btn btn-secondary" onclick="prevStep()">
+                        <i class="fas fa-arrow-left"></i> पछाडि
+                    </button>
+                    <button class="btn btn-primary" onclick="nextStep()" id="step2Next" disabled>
+                        टाइमर सुरु गर्नुहोस् <i class="fas fa-clock"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Step 3: Timer -->
+            <div class="step" id="step3">
+                <div class="step-header">
+                    <div class="step-number">3</div>
+                    <h2 class="step-title">समय गिनिरहेका छौं</h2>
+                    <p class="step-description">कार्यालयमा बसेको समय ट्रयाक गरिरहेका छौं</p>
+                </div>
+                
+                <div class="timer-section">
+                    <div class="timer-display">
+                        <div class="timer-time" id="timerDisplay">00:00:00</div>
+                        <div class="timer-label">समय बितेको</div>
+                    </div>
+                    
+                    <div class="encouragement">
+                        <i class="fas fa-heart"></i> धैर्य गर्नुहोस् - तपाईंको समय मूल्यवान छ
+                    </div>
+                </div>
+                
+                <div class="action-buttons">
+                    <button class="btn btn-success" onclick="completeService()">
+                        <i class="fas fa-check-circle"></i> काम सकियो
+                    </button>
+                    <button class="btn btn-warning" onclick="partialComplete()">
+                        <i class="fas fa-pause-circle"></i> आधा मात्र सकियो
+                    </button>
+                    <button class="btn btn-danger" onclick="failedService()">
+                        <i class="fas fa-times-circle"></i> काम भएन
+                    </button>
+                </div>
+                
+                <div class="help-text">
+                    कुनै पनि बटन थिचेर आफ्नो अनुभव साझा गर्न सक्नुहुन्छ
+                </div>
+            </div>
+            
+            <!-- Step 4: Quick Feedback -->
+            <div class="step" id="step4">
+                <div class="step-header">
+                    <div class="step-number">4</div>
+                    <h2 class="step-title">तपाईंको मन कस्तो छ?</h2>
+                    <p class="step-description">छिटो र सजिलो तरिकाले बताउनुहोस्</p>
+                </div>
+                
+                <div class="mood-selection" id="moodSelect">
+                    <div class="mood-option" data-mood="excellent">
+                        <span class="emoji">😊</span>
+                        <div class="label">उत्कृष्ट</div>
+                    </div>
+                    <div class="mood-option" data-mood="good">
+                        <span class="emoji">🙂</span>
+                        <div class="label">राम्रो</div>
+                    </div>
+                    <div class="mood-option" data-mood="okay">
+                        <span class="emoji">😐</span>
+                        <div class="label">ठीकै</div>
+                    </div>
+                    <div class="mood-option" data-mood="poor">
+                        <span class="emoji">🙁</span>
+                        <div class="label">नराम्रो</div>
+                    </div>
+                    <div class="mood-option" data-mood="terrible">
+                        <span class="emoji">😞</span>
+                        <div class="label">खराब</div>
+                    </div>
+                </div>
+                
+                <div class="rating-grid">
+                    <div class="rating-item">
+                        <div class="rating-question">
+                            <i class="fas fa-money-bill" style="color: var(--danger-color);"></i>
+                            के घुस माग्यो?
+                        </div>
+                        <div class="yes-no-buttons">
+                            <div class="yes-no-btn danger" data-bribe="yes">
+                                छ माग्यो 😠
+                            </div>
+                            <div class="yes-no-btn" data-bribe="no">
+                                छैन मागेन 😊
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="rating-item">
+                        <div class="rating-question">
+                            <i class="fas fa-users" style="color: var(--info-color);"></i>
+                            कर्मचारीको व्यवहार कस्तो थियो?
+                        </div>
+                        <div class="star-rating" data-rating="staff">
+                            <span class="star" data-value="1">⭐</span>
+                            <span class="star" data-value="2">⭐</span>
+                            <span class="star" data-value="3">⭐</span>
+                            <span class="star" data-value="4">⭐</span>
+                            <span class="star" data-value="5">⭐</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-comment"></i> के भन्न चाहनुहुन्छ? (वैकल्पिक)
+                    </label>
+                    <textarea class="form-textarea" id="quickComment" 
+                              placeholder="आफ्नो अनुभव छोटकरीमा लेख्नुहोस्..."></textarea>
+                </div>
+                
+                <div class="action-buttons">
+                    <button class="btn btn-secondary" onclick="prevStep()">
+                        <i class="fas fa-arrow-left"></i> पछाडि
+                    </button>
+                    <button class="btn btn-primary" onclick="submitFeedback()">
+                        <i class="fas fa-paper-plane"></i> पेश गर्नुहोस्
+                    </button>
+                </div>
+                
+                <div class="skip-option">
+                    <span class="skip-link" onclick="submitFeedback()">
+                        केही नभनेर पनि पेश गर्न सक्नुहुन्छ
+                    </span>
+                </div>
+            </div>
+            
+            <!-- Step 5: Thank You -->
+            <div class="step" id="step5">
+                <div class="step-header">
+                    <div class="step-number">✓</div>
+                    <h2 class="step-title">धेरै धेरै धन्यवाद!</h2>
+                    <p class="step-description">तपाईंको योगदानले नेपाल सुधार गर्नेछ</p>
+                </div>
+                
+                <div class="success-animation">
+                    <div class="success-icon">🙏</div>
+                    <p style="font-size: 1.125rem; color: var(--text-secondary); margin-bottom: 2rem;">
+                        <strong>तपाईंको आवाज सुनियो!</strong><br>
+                        यस्तै साझा गरेर हामी मिलेर नेपालको सेवा सुधार गर्नेछौं।
+                    </p>
+                    
+                    <div style="background: var(--bg-secondary); padding: 1.5rem; border-radius: var(--radius-lg); margin: 2rem 0;">
+                        <h3 style="color: var(--text-primary); margin-bottom: 1rem;">तपाईंको सारांश:</h3>
+                        <div id="feedbackSummary" style="color: var(--text-secondary);"></div>
+                    </div>
+                </div>
+                
+                <div class="action-buttons">
+                    <button class="btn btn-primary" onclick="resetTracker()">
+                        <i class="fas fa-plus"></i> अर्को ट्रयाकिङ
+                    </button>
+                    <a href="unified-nepal-platform.html" class="btn btn-secondary">
+                        <i class="fas fa-home"></i> मुख्य पृष्ठ
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentStep = 1;
+        let timerInterval;
+        let startTime;
+        let trackingData = {
+            location: '',
+            service: '',
+            mood: '',
+            bribeAsked: '',
+            staffRating: 0,
+            comment: '',
+            duration: '',
+            outcome: ''
+        };
+        
+        function updateProgressDots() {
+            for (let i = 1; i <= 5; i++) {
+                const dot = document.getElementById(`dot${i}`);
+                if (i < currentStep) {
+                    dot.className = 'progress-dot completed';
+                } else if (i === currentStep) {
+                    dot.className = 'progress-dot active';
+                } else {
+                    dot.className = 'progress-dot';
+                }
+            }
+        }
+        
+        function nextStep() {
+            if (currentStep === 2) {
+                startTimer();
+            }
+            
+            document.getElementById(`step${currentStep}`).classList.remove('active');
+            currentStep++;
+            document.getElementById(`step${currentStep}`).classList.add('active');
+            updateProgressDots();
+        }
+        
+        function prevStep() {
+            if (currentStep === 3) {
+                stopTimer();
+            }
+            
+            document.getElementById(`step${currentStep}`).classList.remove('active');
+            currentStep--;
+            document.getElementById(`step${currentStep}`).classList.add('active');
+            updateProgressDots();
+        }
+        
+        function startTimer() {
+            startTime = new Date();
+            timerInterval = setInterval(updateTimer, 1000);
+        }
+        
+        function stopTimer() {
+            if (timerInterval) {
+                clearInterval(timerInterval);
+            }
+        }
+        
+        function updateTimer() {
+            const now = new Date();
+            const elapsed = now - startTime;
+            
+            const hours = Math.floor(elapsed / (1000 * 60 * 60));
+            const minutes = Math.floor((elapsed % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((elapsed % (1000 * 60)) / 1000);
+            
+            const timeString = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            document.getElementById('timerDisplay').textContent = timeString;
+            trackingData.duration = timeString;
+        }
+        
+        function completeService() {
+            trackingData.outcome = 'completed';
+            stopTimer();
+            nextStep();
+        }
+        
+        function partialComplete() {
+            trackingData.outcome = 'partial';
+            stopTimer();
+            nextStep();
+        }
+        
+        function failedService() {
+            trackingData.outcome = 'failed';
+            stopTimer();
+            nextStep();
+        }
+        
+        function submitFeedback() {
+            // Collect final data
+            trackingData.comment = document.getElementById('quickComment').value;
+            
+            console.log('Feedback Data:', trackingData);
+            
+            // Show summary
+            showFeedbackSummary();
+            
+            // Move to thank you page
+            stopTimer();
+            nextStep();
+        }
+        
+        function showFeedbackSummary() {
+            const summary = document.getElementById('feedbackSummary');
+            const outcomeText = {
+                'completed': '✅ काम पूरा भयो',
+                'partial': '⚠️ आधा मात्र भयो', 
+                'failed': '❌ काम भएन'
+            };
+            
+            const moodText = {
+                'excellent': '😊 उत्कृष्ट',
+                'good': '🙂 राम्रो',
+                'okay': '😐 ठीकै',
+                'poor': '🙁 नराम्रो',
+                'terrible': '😞 खराब'
+            };
+            
+            summary.innerHTML = `
+                <p><strong>ठाउँ:</strong> ${trackingData.location}</p>
+                <p><strong>सेवा:</strong> ${trackingData.service}</p>
+                <p><strong>समय:</strong> ${trackingData.duration}</p>
+                <p><strong>परिणाम:</strong> ${outcomeText[trackingData.outcome] || trackingData.outcome}</p>
+                <p><strong>मुड:</strong> ${moodText[trackingData.mood] || 'नछानिएको'}</p>
+                <p><strong>घुस:</strong> ${trackingData.bribeAsked === 'yes' ? '😠 माग्यो' : trackingData.bribeAsked === 'no' ? '😊 मागेन' : 'नछानिएको'}</p>
+                ${trackingData.comment ? `<p><strong>टिप्पणी:</strong> ${trackingData.comment}</p>` : ''}
+            `;
+        }
+        
+        function resetTracker() {
+            currentStep = 1;
+            trackingData = {
+                location: '',
+                service: '',
+                mood: '',
+                bribeAsked: '',
+                staffRating: 0,
+                comment: '',
+                duration: '',
+                outcome: ''
+            };
+            
+            document.querySelectorAll('.step').forEach(step => step.classList.remove('active'));
+            document.getElementById('step1').classList.add('active');
+            document.querySelectorAll('.quick-option, .mood-option, .yes-no-btn').forEach(el => el.classList.remove('selected'));
+            document.querySelectorAll('.star').forEach(star => star.classList.remove('active'));
+            document.getElementById('quickComment').value = '';
+            updateProgressDots();
+        }
+        
+        function showDetailedForm() {
+            alert('विस्तृत फारम छिट्टै आउनेछ! अहिलेलाई छिटो विकल्प प्रयोग गर्नुहोस्।');
+        }
+        
+        // Event Listeners
+        document.getElementById('locationSelect').addEventListener('click', function(e) {
+            if (e.target.closest('.quick-option')) {
+                document.querySelectorAll('#locationSelect .quick-option').forEach(opt => opt.classList.remove('selected'));
+                e.target.closest('.quick-option').classList.add('selected');
+                trackingData.location = e.target.closest('.quick-option').dataset.location;
+                document.getElementById('step1Next').disabled = false;
+            }
+        });
+        
+        document.getElementById('serviceSelect').addEventListener('click', function(e) {
+            if (e.target.closest('.quick-option')) {
+                document.querySelectorAll('#serviceSelect .quick-option').forEach(opt => opt.classList.remove('selected'));
+                e.target.closest('.quick-option').classList.add('selected');
+                trackingData.service = e.target.closest('.quick-option').dataset.service;
+                document.getElementById('step2Next').disabled = false;
+            }
+        });
+        
+        document.getElementById('moodSelect').addEventListener('click', function(e) {
+            if (e.target.closest('.mood-option')) {
+                document.querySelectorAll('#moodSelect .mood-option').forEach(opt => opt.classList.remove('selected'));
+                e.target.closest('.mood-option').classList.add('selected');
+                trackingData.mood = e.target.closest('.mood-option').dataset.mood;
+            }
+        });
+        
+        // Bribe question handlers
+        document.querySelectorAll('[data-bribe]').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('[data-bribe]').forEach(b => b.classList.remove('selected'));
+                this.classList.add('selected');
+                trackingData.bribeAsked = this.dataset.bribe;
+            });
+        });
+        
+        // Star rating functionality
+        document.querySelectorAll('.star-rating').forEach(ratingGroup => {
+            const stars = ratingGroup.querySelectorAll('.star');
+            const ratingType = ratingGroup.dataset.rating;
+            
+            stars.forEach(star => {
+                star.addEventListener('click', function() {
+                    const value = parseInt(this.dataset.value);
+                    trackingData.staffRating = value;
+                    
+                    stars.forEach((s, index) => {
+                        if (index < value) {
+                            s.classList.add('active');
+                        } else {
+                            s.classList.remove('active');
+                        }
+                    });
+                });
+            });
+        });
+        
+        // Initialize
+        updateProgressDots();
+    </script>
+</body>
+</html>

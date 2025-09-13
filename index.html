@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="ne">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nepal Digital Platform | नेपाल डिजिटल प्लेटफर्म</title>
+    
+    <!-- Fonts and Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #8b5cf6;
+            --accent: #f59e0b;
+            --success: #10b981;
+            --danger: #ef4444;
+            
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-card: #334155;
+            
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --text-muted: #94a3b8;
+            
+            --border: #475569;
+            --shadow: 0 10px 25px rgba(0,0,0,0.3);
+            --radius: 1rem;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Noto Sans Devanagari', 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+            min-height: 100vh;
+            color: var(--text-primary);
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            position: relative;
+            overflow-x: hidden;
+            overflow-y: auto;
+            padding: 1rem 0;
+        }
+        
+        /* Animated background */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 20% 80%, rgba(99, 102, 241, 0.1), transparent 50%),
+                        radial-gradient(circle at 80% 20%, rgba(139, 92, 246, 0.1), transparent 50%),
+                        radial-gradient(circle at 40% 40%, rgba(245, 158, 11, 0.05), transparent 50%);
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .container {
+            max-width: 800px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 1rem;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .hero-section {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .logo {
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        .hero-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .hero-subtitle {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .platform-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .platform-card {
+            background: rgba(51, 65, 85, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .platform-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            transition: left 0.5s ease;
+        }
+        
+        .platform-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: var(--shadow);
+            border-color: var(--primary);
+        }
+        
+        .platform-card:hover::before {
+            left: 100%;
+        }
+        
+        .card-icon {
+            font-size: 3.5rem;
+            margin-bottom: 1.5rem;
+            display: block;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
+        }
+        
+        .card-title {
+            font-size: 1.75rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+        
+        .card-subtitle {
+            font-size: 1rem;
+            color: var(--text-muted);
+            margin-bottom: 1.5rem;
+        }
+        
+        .card-description {
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+        
+        .card-stats {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 2rem;
+            padding: 1rem;
+            background: rgba(0,0,0,0.2);
+            border-radius: 0.5rem;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            display: block;
+        }
+        
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+        
+        .card-button {
+            width: 100%;
+            padding: 1rem 1.5rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            border-radius: 0.75rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: inherit;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .card-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.3s ease;
+        }
+        
+        .card-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
+        }
+        
+        .card-button:hover::before {
+            left: 100%;
+        }
+        
+        .footer {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+        
+        .footer-stats {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 1rem;
+        }
+        
+        .footer-stat {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            .hero-title {
+                font-size: 2rem;
+            }
+            
+            .platform-cards {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+            
+            .platform-card {
+                padding: 2rem;
+            }
+            
+            .footer-stats {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+        }
+        
+        /* Loading animation */
+        .loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .loading.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .loading-content {
+            text-align: center;
+            color: var(--text-primary);
+        }
+        
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid var(--border);
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="loading" id="loading">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <p>लोड हुँदै...</p>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="hero-section">
+            <div class="logo">🇳🇵</div>
+            <h1 class="hero-title">Nepal Digital Platform</h1>
+            <p class="hero-subtitle">
+                राजनीति बुझौं, सेवा सुधारौं - डिजिटल नेपालको यात्रामा सामेल होऔं
+            </p>
+        </div>
+        
+        <div class="platform-cards">
+            <!-- Political Game Card -->
+            <div class="platform-card" onclick="goToGame()">
+                <span class="card-icon">🎭</span>
+                <h2 class="card-title">के होला त देशमा अब?</h2>
+                <p class="card-subtitle">राजनीतिक खेल र शिक्षा</p>
+                <p class="card-description">
+                    प्रचण्ड, देउवा, ओली बनेर नेपालको राजनीतिक संकट सम्हाल्नुहोस्। 
+                    वास्तविक घटनाहरूमा आधारित निर्णयहरू लिएर देश चलाउने अनुभव लिनुहोस्।
+                </p>
+                <div class="card-stats">
+                    <div class="stat-item">
+                        <span class="stat-number">9</span>
+                        <span class="stat-label">नेताहरू</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">107</span>
+                        <span class="stat-label">परिस्थितिहरू</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">20+</span>
+                        <span class="stat-label">मिनेट खेल</span>
+                    </div>
+                </div>
+                <button class="card-button">
+                    <i class="fas fa-gamepad"></i> खेल्न सुरु गरौं
+                </button>
+            </div>
+            
+            <!-- Office Tracker Card -->
+            <div class="platform-card" onclick="goToTracker()">
+                <span class="card-icon">🏛️</span>
+                <h2 class="card-title">कार्यालयको अनुभव साझा गरौं</h2>
+                <p class="card-subtitle">सरकारी सेवा ट्रयाकिङ</p>
+                <p class="card-description">
+                    सरकारी कार्यालयमा बितेको समय र अनुभव साझा गरेर सेवा सुधारमा योगदान पुर्याउनुहोस्। 
+                    सबैको आवाजले मिलेर नेपाल सुधार्छौं।
+                </p>
+                <div class="card-stats">
+                    <div class="stat-item">
+                        <span class="stat-number">77</span>
+                        <span class="stat-label">जिल्लाहरू</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">2</span>
+                        <span class="stat-label">मिनेट मात्र</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">100%</span>
+                        <span class="stat-label">निःशुल्क</span>
+                    </div>
+                </div>
+                <button class="card-button">
+                    <i class="fas fa-clipboard-list"></i> अनुभव साझा गरौं
+                </button>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <div class="footer-stats">
+                <div class="footer-stat">
+                    <i class="fas fa-users"></i>
+                    <span>सबैको लागि निःशुल्क</span>
+                </div>
+                <div class="footer-stat">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>गुमनाम र सुरक्षित</span>
+                </div>
+                <div class="footer-stat">
+                    <i class="fas fa-mobile-alt"></i>
+                    <span>मोबाइल फ्रेन्डली</span>
+                </div>
+            </div>
+            <p>🚀 Made with ❤️ for Nepal's digital future</p>
+        </div>
+    </div>
+
+    <script>
+        function showLoading() {
+            document.getElementById('loading').classList.add('active');
+        }
+        
+        function goToGame() {
+            showLoading();
+            setTimeout(() => {
+                window.location.href = 'nepal-optimized-strategy.html';
+            }, 800);
+        }
+        
+        function goToTracker() {
+            showLoading();
+            setTimeout(() => {
+                window.location.href = 'office-tracker-v2.html';
+            }, 800);
+        }
+        
+        // Add entrance animation
+        document.addEventListener('DOMContentLoaded', function() {
+            const cards = document.querySelectorAll('.platform-card');
+            cards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(30px)';
+                card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                
+                setTimeout(() => {
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, 200 * (index + 1));
+            });
+        });
+        
+        // Add some interactive particles
+        function createParticle() {
+            const particle = document.createElement('div');
+            particle.style.position = 'absolute';
+            particle.style.width = '4px';
+            particle.style.height = '4px';
+            particle.style.background = `rgba(${99 + Math.random() * 50}, ${102 + Math.random() * 50}, 241, 0.6)`;
+            particle.style.borderRadius = '50%';
+            particle.style.pointerEvents = 'none';
+            particle.style.left = Math.random() * 100 + '%';
+            particle.style.top = '100%';
+            particle.style.animation = `float-up ${3 + Math.random() * 2}s linear forwards`;
+            
+            document.body.appendChild(particle);
+            
+            setTimeout(() => {
+                particle.remove();
+            }, 5000);
+        }
+        
+        // Add floating particles CSS
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes float-up {
+                0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+                100% { transform: translateY(-100vh) rotate(360deg); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+        
+        // Create particles periodically
+        setInterval(createParticle, 2000);
+    </script>
+</body>
+</html>
