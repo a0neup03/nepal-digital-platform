@@ -634,37 +634,64 @@
                     <p class="step-description">सबैभन्दा सामान्य ठाउँहरू छनोट गर्नुहोस्</p>
                 </div>
                 
-                <div class="quick-select" id="locationSelect">
-                    <div class="quick-option" data-location="kathmandu-admin">
-                        <span class="icon">🏛️</span>
-                        <div class="title">काठमाडौं</div>
-                        <div class="subtitle">जिल्ला प्रशासन</div>
-                    </div>
-                    <div class="quick-option" data-location="kathmandu-passport">
-                        <span class="icon">📘</span>
-                        <div class="title">काठमाडौं</div>
-                        <div class="subtitle">राहदानी कार्यालय</div>
-                    </div>
-                    <div class="quick-option" data-location="lalitpur-admin">
-                        <span class="icon">🏛️</span>
-                        <div class="title">ललितपुर</div>
-                        <div class="subtitle">जिल्ला प्रशासन</div>
-                    </div>
-                    <div class="quick-option" data-location="bhaktapur-admin">
-                        <span class="icon">🏛️</span>
-                        <div class="title">भक्तपुर</div>
-                        <div class="subtitle">जिल्ला प्रशासन</div>
-                    </div>
-                    <div class="quick-option" data-location="transport-bagmati">
-                        <span class="icon">🚗</span>
-                        <div class="title">यातायात</div>
-                        <div class="subtitle">बागमती प्रदेश</div>
-                    </div>
-                    <div class="quick-option" data-location="other">
-                        <span class="icon">📍</span>
-                        <div class="title">अन्य ठाउँ</div>
-                        <div class="subtitle">फरक कार्यालय</div>
-                    </div>
+                <div class="form-group">
+                    <label class="form-label">प्रदेश छान्नुहोस्:</label>
+                    <select class="form-select" id="provinceSelect">
+                        <option value="">प्रदेश छान्नुहोस्...</option>
+                        <option value="bagmati">बागमती प्रदेश</option>
+                        <option value="madhesh">मधेश प्रदेश</option>
+                        <option value="lumbini">लुम्बिनी प्रदेश</option>
+                        <option value="gandaki">गण्डकी प्रदेश</option>
+                        <option value="karnali">कर्णाली प्रदेश</option>
+                        <option value="sudurpaschim">सुदूरपश्चिम प्रदेश</option>
+                        <option value="koshi">कोशी प्रदेश</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">जिल्ला छान्नुहोस्:</label>
+                    <select class="form-select" id="districtSelect" disabled>
+                        <option value="">पहिले प्रदेश छान्नुहोस्...</option>
+                    </select>
+                </div>
+                
+                <div class="form-group" id="wardGroup" style="display: none;">
+                    <label class="form-label">वडा छान्नुहोस् (यदि लागू छ):</label>
+                    <select class="form-select" id="wardSelect">
+                        <option value="">वडा छान्नुहोस्...</option>
+                        <option value="1">वडा नं. १</option>
+                        <option value="2">वडा नं. २</option>
+                        <option value="3">वडा नं. ३</option>
+                        <option value="4">वडा नं. ४</option>
+                        <option value="5">वडा नं. ५</option>
+                        <option value="6">वडा नं. ६</option>
+                        <option value="7">वडा नं. ७</option>
+                        <option value="8">वडा नं. ८</option>
+                        <option value="9">वडा नं. ९</option>
+                        <option value="10">वडा नं. १०</option>
+                        <option value="11">वडा नं. ११</option>
+                        <option value="12">वडा नं. १२</option>
+                        <option value="13">वडा नं. १३</option>
+                        <option value="14">वडा नं. १४</option>
+                        <option value="15">वडा नं. १५</option>
+                        <option value="16">वडा नं. १६</option>
+                        <option value="17">वडा नं. १७</option>
+                        <option value="18">वडा नं. १८</option>
+                        <option value="19">वडा नं. १९</option>
+                        <option value="20">वडा नं. २०</option>
+                        <option value="21">वडा नं. २१</option>
+                        <option value="22">वडा नं. २२</option>
+                        <option value="23">वडा नं. २३</option>
+                        <option value="24">वडा नं. २४</option>
+                        <option value="25">वडा नं. २५</option>
+                        <option value="26">वडा नं. २६</option>
+                        <option value="27">वडा नं. २७</option>
+                        <option value="28">वडा नं. २८</option>
+                        <option value="29">वडा नं. २९</option>
+                        <option value="30">वडा नं. ३०</option>
+                        <option value="31">वडा नं. ३१</option>
+                        <option value="32">वडा नं. ३२</option>
+                    </select>
                 </div>
                 
                 <div class="action-buttons">
@@ -688,37 +715,80 @@
                     <p class="step-description">सबैभन्दा सामान्य सेवाहरू</p>
                 </div>
                 
-                <div class="quick-select" id="serviceSelect">
-                    <div class="quick-option" data-service="citizenship">
-                        <span class="icon">🆔</span>
-                        <div class="title">नागरिकता</div>
-                        <div class="subtitle">नयाँ/नवीकरण</div>
-                    </div>
-                    <div class="quick-option" data-service="passport">
-                        <span class="icon">📘</span>
-                        <div class="title">राहदानी</div>
-                        <div class="subtitle">नयाँ/नवीकरण</div>
-                    </div>
-                    <div class="quick-option" data-service="license">
-                        <span class="icon">🚗</span>
-                        <div class="title">लाइसेन्स</div>
-                        <div class="subtitle">सवारी अनुमति</div>
-                    </div>
-                    <div class="quick-option" data-service="certificate">
-                        <span class="icon">📜</span>
-                        <div class="title">प्रमाणपत्र</div>
-                        <div class="subtitle">जन्म/विवाह</div>
-                    </div>
-                    <div class="quick-option" data-service="land">
-                        <span class="icon">🏞️</span>
-                        <div class="title">जग्गा दर्ता</div>
-                        <div class="subtitle">मालपोत कामकाज</div>
-                    </div>
-                    <div class="quick-option" data-service="other">
-                        <span class="icon">📋</span>
-                        <div class="title">अन्य सेवा</div>
-                        <div class="subtitle">फरक काम</div>
-                    </div>
+                <div class="form-group">
+                    <label class="form-label">कार्यालयको प्रकार छान्नुहोस्:</label>
+                    <select class="form-select" id="officeTypeSelect">
+                        <option value="">कार्यालयको प्रकार छान्नुहोस्...</option>
+                        <optgroup label="जिल्ला तहका कार्यालयहरू">
+                            <option value="district_admin">🏛️ जिल्ला प्रशासन कार्यालय</option>
+                            <option value="passport_office">📘 राहदानी कार्यालय</option>
+                            <option value="transport_office">🚗 यातायात व्यवस्था कार्यालय</option>
+                            <option value="land_registry">🏞️ मालपोत कार्यालय</option>
+                            <option value="district_court">⚖️ जिल्ला अदालत</option>
+                            <option value="district_health">🏥 जिल्ला स्वास्थ्य कार्यालय</option>
+                            <option value="district_education">📚 जिल्ला शिक्षा कार्यालय</option>
+                        </optgroup>
+                        <optgroup label="स्थानीय तहका कार्यालयहरू">
+                            <option value="ward_office">🏢 वडा कार्यालय</option>
+                            <option value="municipality">🏛️ नगरपालिका/गाउँपालिका</option>
+                            <option value="rural_municipality">🏡 गाउँपालिका</option>
+                        </optgroup>
+                        <optgroup label="सेवा केन्द्रहरू">
+                            <option value="nagarik_app">📱 नागरिक एप केन्द्र</option>
+                            <option value="one_door_service">🚪 एकढोका सेवा</option>
+                            <option value="citizen_service">👥 नागरिक सेवा केन्द्र</option>
+                        </optgroup>
+                        <optgroup label="विशेष कार्यालयहरू">
+                            <option value="bank">🏦 बैंक/वित्तीय संस्था</option>
+                            <option value="cooperative">🤝 सहकारी संस्था</option>
+                            <option value="police_station">👮 प्रहरी कार्यालय</option>
+                            <option value="tax_office">💰 राजस्व कार्यालय</option>
+                        </optgroup>
+                        <option value="other">📋 अन्य कार्यालय</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">के सेवा लिन जानुभयो?</label>
+                    <select class="form-select" id="serviceSelect">
+                        <option value="">सेवा छान्नुहोस्...</option>
+                        <optgroup label="कागजातहरू">
+                            <option value="citizenship_new">🆔 नागरिकता (नयाँ)</option>
+                            <option value="citizenship_renew">🆔 नागरिकता (नवीकरण)</option>
+                            <option value="passport_new">📘 राहदानी (नयाँ)</option>
+                            <option value="passport_renew">📘 राहदानी (नवीकरण)</option>
+                            <option value="birth_certificate">👶 जन्म दर्ता प्रमाणपत्र</option>
+                            <option value="marriage_certificate">💒 विवाह दर्ता प्रमाणपत्र</option>
+                            <option value="death_certificate">⚰️ मृत्यु दर्ता प्रमाणपत्र</option>
+                            <option value="migration_certificate">🏠 बसाइसराई प्रमाणपत्र</option>
+                        </optgroup>
+                        <optgroup label="लाइसेन्स र अनुमतिपत्र">
+                            <option value="driving_license_new">🚗 सवारी चालक अनुमतिपत्र (नयाँ)</option>
+                            <option value="driving_license_renew">🚗 सवारी चालक अनुमतिपत्र (नवीकरण)</option>
+                            <option value="vehicle_registration">📋 सवारी साधन दर्ता</option>
+                            <option value="business_license">💼 व्यवसाय दर्ता</option>
+                            <option value="company_registration">🏢 कम्पनी दर्ता</option>
+                        </optgroup>
+                        <optgroup label="जग्गा सम्बन्धी">
+                            <option value="land_ownership">📜 जग्गाधनी प्रमाणपत्र</option>
+                            <option value="land_registration">🏞️ जग्गा दर्ता</option>
+                            <option value="house_registration">🏡 घर दर्ता</option>
+                            <option value="property_transfer">🔄 सम्पत्ति हस्तान्तरण</option>
+                        </optgroup>
+                        <optgroup label="बैंकिङ सेवा">
+                            <option value="bank_account">💳 बैंक खाता खोल्ने</option>
+                            <option value="loan_application">💰 ऋण निवेदन</option>
+                            <option value="remittance">💸 रेमिट्यान्स</option>
+                        </optgroup>
+                        <optgroup label="अन्य सेवाहरू">
+                            <option value="pension">👴 पेन्सन</option>
+                            <option value="social_security">🛡️ सामाजिक सुरक्षा</option>
+                            <option value="tax_clearance">💰 कर चुक्ता प्रमाणपत्र</option>
+                            <option value="health_services">🏥 स्वास्थ्य सेवा</option>
+                            <option value="education_services">📚 शैक्षिक सेवा</option>
+                        </optgroup>
+                        <option value="other">📋 अन्य सेवा</option>
+                    </select>
                 </div>
                 
                 <div class="action-buttons">
@@ -891,7 +961,10 @@
         let timerInterval;
         let startTime;
         let trackingData = {
-            location: '',
+            province: '',
+            district: '',
+            ward: '',
+            officeType: '',
             service: '',
             mood: '',
             bribeAsked: '',
@@ -899,6 +972,39 @@
             comment: '',
             duration: '',
             outcome: ''
+        };
+        
+        // District data by province
+        const districtsByProvince = {
+            bagmati: [
+                'काठमाडौं', 'ललितपुर', 'भक्तपुर', 'नुवाकोट', 'रसुवा', 'धादिङ्ग',
+                'काभ्रेपलाञ्चोक', 'सिन्धुली', 'दोलखा', 'सर्लाही', 'महोत्तरी', 
+                'रौतहट', 'बारा', 'पर्सा', 'चितवन'
+            ],
+            madhesh: [
+                'सप्तरी', 'सिराहा', 'धनुषा', 'महोत्तरी', 'सर्लाही', 'रौतहट', 'बारा', 'पर्सा'
+            ],
+            lumbini: [
+                'रुपन्देही', 'कपिलवस्तु', 'पाल्पा', 'नवलपरासी पूर्व', 'नवलपरासी पश्चिम',
+                'गुल्मी', 'अर्घाखाँची', 'प्युठान', 'रोल्पा', 'दाङ', 'बाँके', 'बर्दिया'
+            ],
+            gandaki: [
+                'गोरखा', 'लमजुङ', 'तनहुँ', 'स्याङ्जा', 'कास्की', 'मनाङ', 'मुस्ताङ',
+                'म्याग्दी', 'पर्वत', 'बागलुङ', 'नवलपुर'
+            ],
+            karnali: [
+                'डोल्पा', 'जुम्ला', 'कालिकोट', 'मुगु', 'हुम्ला', 'सुर्खेत',
+                'दैलेख', 'जाजरकोट', 'रुकुम पश्चिम', 'सल्यान'
+            ],
+            sudurpaschim: [
+                'अछाम', 'डोटी', 'बैतडी', 'दार्चुला', 'बझाङ', 'बाजुरा',
+                'कैलाली', 'कञ्चनपुर', 'डडेल्धुरा'
+            ],
+            koshi: [
+                'झापा', 'इलाम', 'पाँचथर', 'ताप्लेजुङ', 'संखुवासभा', 'तेह्रथुम',
+                'धनकुटा', 'भोजपुर', 'सोलुखुम्बु', 'खोटाङ', 'ओखलढुंगा', 'उदयपुर',
+                'सुनसरी', 'मोरङ'
+            ]
         };
         
         function updateProgressDots() {
@@ -1008,8 +1114,12 @@
                 'terrible': '😞 खराब'
             };
             
+            const wardDisplay = trackingData.ward ? `, वडा नं. ${trackingData.ward}` : '';
+            const locationDisplay = `${trackingData.district}${wardDisplay}, ${trackingData.province}`;
+            
             summary.innerHTML = `
-                <p><strong>ठाउँ:</strong> ${trackingData.location}</p>
+                <p><strong>ठाउँ:</strong> ${locationDisplay}</p>
+                <p><strong>कार्यालय:</strong> ${trackingData.officeType}</p>
                 <p><strong>सेवा:</strong> ${trackingData.service}</p>
                 <p><strong>समय:</strong> ${trackingData.duration}</p>
                 <p><strong>परिणाम:</strong> ${outcomeText[trackingData.outcome] || trackingData.outcome}</p>
@@ -1022,7 +1132,10 @@
         function resetTracker() {
             currentStep = 1;
             trackingData = {
-                location: '',
+                province: '',
+                district: '',
+                ward: '',
+                officeType: '',
                 service: '',
                 mood: '',
                 bribeAsked: '',
@@ -1034,9 +1147,18 @@
             
             document.querySelectorAll('.step').forEach(step => step.classList.remove('active'));
             document.getElementById('step1').classList.add('active');
-            document.querySelectorAll('.quick-option, .mood-option, .yes-no-btn').forEach(el => el.classList.remove('selected'));
+            document.querySelectorAll('.mood-option, .yes-no-btn').forEach(el => el.classList.remove('selected'));
             document.querySelectorAll('.star').forEach(star => star.classList.remove('active'));
             document.getElementById('quickComment').value = '';
+            document.getElementById('provinceSelect').value = '';
+            document.getElementById('districtSelect').value = '';
+            document.getElementById('districtSelect').disabled = true;
+            document.getElementById('wardSelect').value = '';
+            document.getElementById('wardGroup').style.display = 'none';
+            document.getElementById('officeTypeSelect').value = '';
+            document.getElementById('serviceSelect').value = '';
+            document.getElementById('step1Next').disabled = true;
+            document.getElementById('step2Next').disabled = true;
             updateProgressDots();
         }
         
@@ -1045,23 +1167,76 @@
         }
         
         // Event Listeners
-        document.getElementById('locationSelect').addEventListener('click', function(e) {
-            if (e.target.closest('.quick-option')) {
-                document.querySelectorAll('#locationSelect .quick-option').forEach(opt => opt.classList.remove('selected'));
-                e.target.closest('.quick-option').classList.add('selected');
-                trackingData.location = e.target.closest('.quick-option').dataset.location;
-                document.getElementById('step1Next').disabled = false;
+        document.getElementById('provinceSelect').addEventListener('change', function() {
+            const province = this.value;
+            const districtSelect = document.getElementById('districtSelect');
+            const wardGroup = document.getElementById('wardGroup');
+            
+            trackingData.province = province;
+            
+            if (province) {
+                districtSelect.disabled = false;
+                districtSelect.innerHTML = '<option value="">जिल्ला छान्नुहोस्...</option>';
+                
+                districtsByProvince[province].forEach(district => {
+                    const option = document.createElement('option');
+                    option.value = district;
+                    option.textContent = district;
+                    districtSelect.appendChild(option);
+                });
+            } else {
+                districtSelect.disabled = true;
+                districtSelect.innerHTML = '<option value="">पहिले प्रदेश छान्नुहोस्...</option>';
+                wardGroup.style.display = 'none';
             }
+            
+            checkStep1Complete();
         });
         
-        document.getElementById('serviceSelect').addEventListener('click', function(e) {
-            if (e.target.closest('.quick-option')) {
-                document.querySelectorAll('#serviceSelect .quick-option').forEach(opt => opt.classList.remove('selected'));
-                e.target.closest('.quick-option').classList.add('selected');
-                trackingData.service = e.target.closest('.quick-option').dataset.service;
-                document.getElementById('step2Next').disabled = false;
+        document.getElementById('districtSelect').addEventListener('change', function() {
+            const district = this.value;
+            const wardGroup = document.getElementById('wardGroup');
+            
+            trackingData.district = district;
+            
+            // Show ward selection for municipalities and some services
+            if (district) {
+                wardGroup.style.display = 'block';
+            } else {
+                wardGroup.style.display = 'none';
             }
+            
+            checkStep1Complete();
         });
+        
+        document.getElementById('wardSelect').addEventListener('change', function() {
+            trackingData.ward = this.value;
+            checkStep1Complete();
+        });
+        
+        document.getElementById('officeTypeSelect').addEventListener('change', function() {
+            trackingData.officeType = this.value;
+            checkStep2Complete();
+        });
+        
+        document.getElementById('serviceSelect').addEventListener('change', function() {
+            trackingData.service = this.value;
+            checkStep2Complete();
+        });
+        
+        function checkStep1Complete() {
+            const hasProvince = trackingData.province !== '';
+            const hasDistrict = trackingData.district !== '';
+            
+            document.getElementById('step1Next').disabled = !(hasProvince && hasDistrict);
+        }
+        
+        function checkStep2Complete() {
+            const hasOfficeType = trackingData.officeType !== '';
+            const hasService = trackingData.service !== '';
+            
+            document.getElementById('step2Next').disabled = !(hasOfficeType && hasService);
+        }
         
         document.getElementById('moodSelect').addEventListener('click', function(e) {
             if (e.target.closest('.mood-option')) {
