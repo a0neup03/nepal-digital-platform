@@ -6781,6 +6781,266 @@ const NEPALI_EVENTS = [
                 }
             }
         ]
+    },
+
+    // ============================================================================
+    // HISTORICAL EVENTS SCENARIOS - 1990 Democracy Movement & 2006 Jana Andolan
+    // ============================================================================
+
+    {
+        id: "democracy_day_1990_reflection",
+        title: {
+            ne: "१९९० को जनआन्दोलनको सम्झना",
+            en: "Remembering 1990 People's Movement"
+        },
+        description: {
+            ne: "फागुन ७ गते लोकतन्त्र दिवसमा तपाईंलाई १९९० सालको ऐतिहासिक जनआन्दोलनको सम्झना आयो। जब जनताले बहुदलीय लोकतन्त्रको माग गर्दै राजा वीरेन्द्रलाई संवैधानिक राजतन्त्र स्वीकार गर्न बाध्य पार्यो। यो दिवसको सन्देश के होला?",
+            en: "On Democracy Day (Falgun 7), you remember the historic 1990 People's Movement when people demanded multiparty democracy and forced King Birendra to accept constitutional monarchy. What message does this day hold?"
+        },
+        type: "historical_reflection",
+        complexity: "medium",
+        baseWeight: 0.7,
+        realWorldEvent: true,
+        historicalEvent: "1990 People's Movement",
+        
+        choices: [
+            {
+                text: {
+                    ne: "राजतन्त्रको अन्त्य आवश्यक थियो - गणतन्त्र सफलता",
+                    en: "End of monarchy was necessary - republic is success"
+                },
+                outcome: {
+                    ne: "राजतन्त्रको पूर्ण अन्त्यलाई सही निर्णय भन्दै गणतन्त्रको पक्षमा बोल्नुभयो। धेरै युवाहरूले समर्थन गरे तर राजावादीहरू रुष्ट भए।",
+                    en: "Called complete end of monarchy right decision and spoke for republic. Many youth supported but royalists became angry."
+                },
+                isConstitutional: true,
+                effects: { 
+                    stability: 5, morale: 15, stress: 5,
+                    youth: 20, civil_society: 15, democratic_spirit: 25,
+                    royalist: -30, traditional: -15
+                }
+            },
+            {
+                text: {
+                    ne: "संवैधानिक राजतन्त्रमा बस्नुपर्ने थियो - विकास हुन्थ्यो",
+                    en: "Should have stayed with constitutional monarchy - would have developed"
+                },
+                outcome: {
+                    ne: "संवैधानिक राजतन्त्रको पक्षमा बोलेर राजा ज्ञानेन्द्रको गल्तीलाई मात्र समस्या मान्नुभयो। केहीले सन्तुलित भने तर धेरैले पछाडि फर्किएको आलोचना गरे।",
+                    en: "Spoke for constitutional monarchy saying only King Gyanendra's mistake was problem. Some called it balanced but many criticized going backward."
+                },
+                isConstitutional: true,
+                effects: { 
+                    stability: -10, morale: -5, stress: 15,
+                    royalist: 25, traditional: 20, older_voters: 10,
+                    youth: -25, civil_society: -20, democratic_spirit: -15
+                }
+            },
+            {
+                text: {
+                    ne: "जनताको शक्ति अजेय छ - फेरि जनआन्दोलन आवश्यक",
+                    en: "People's power is invincible - need another people's movement"
+                },
+                outcome: {
+                    ne: "भ्रष्टाचार र राजनीतिक संकटको समाधान नयाँ जनआन्दोलनमा रहेको बताउनुभयो। क्रान्तिकारीहरूले उत्साह देखाए तर स्थिरता चाहनेहरू चिन्तित भए।",
+                    en: "Said solution to corruption and political crisis lies in new people's movement. Revolutionaries showed enthusiasm but stability seekers worried."
+                },
+                isConstitutional: true,
+                effects: { 
+                    stability: -15, morale: 20, stress: 20,
+                    revolutionary: 30, youth: 15, civil_society: 10,
+                    business: -20, international: -15, elderly: -20
+                }
+            },
+            {
+                text: {
+                    ne: "त्यो पुरानो कुरा - अब विकासमा मात्र ध्यान दिनुपर्छ",
+                    en: "That's old story - should focus only on development now"
+                },
+                outcome: {
+                    ne: "इतिहासलाई बिर्सेर केवल भविष्यको विकासमा ध्यान दिने कुरा गर्नुभयो। व्यावहारिकहरूले राम्रो भने तर इतिहासकर्मीहरूले आलोचना गरे।",
+                    en: "Talked about forgetting history and focusing only on future development. Pragmatists liked it but historians criticized."
+                },
+                isConstitutional: true,
+                effects: { 
+                    stability: 10, morale: 5, stress: -5,
+                    business: 20, pragmatic: 15, young_professionals: 15,
+                    civil_society: -15, democratic_spirit: -10, intellectuals: -20
+                }
+            }
+        ]
+    },
+
+    {
+        id: "remittance_dependency_crisis",
+        title: {
+            ne: "वैदेशिक रोजगारको निर्भरता संकट",
+            en: "Foreign Employment Dependency Crisis"
+        },
+        description: {
+            ne: "नेपालको ४०% GDP वैदेशिक रोजगारबाट आउने रेमिट्यान्समा निर्भर छ। कोभिड र अन्तर्राष्ट्रिय संकटले यो खतरामा छ। २५ लाख नेपाली विदेशमा काम गरिरहेका छन्। यो निर्भरता कसरी कम गर्ने?",
+            en: "40% of Nepal's GDP depends on remittances from foreign employment. COVID and international crisis threaten this. 2.5 million Nepalis working abroad. How to reduce this dependency?"
+        },
+        type: "economic_policy",
+        complexity: "extreme",
+        baseWeight: 0.9,
+        realWorldEvent: true,
+        economicIssue: "remittance dependency",
+        
+        choices: [
+            {
+                text: {
+                    ne: "स्वदेशमा रोजगारी सिर्जना - उद्योग स्थापना कार्यक्रम",
+                    en: "Create domestic employment - establish industries program"
+                },
+                outcome: {
+                    ne: "राष्ट्रिय उद्योग स्थापना अभियान घोषणा गरेर स्वदेशमै रोजगारी सिर्जनामा लाग्नुभयो। दीर्घकालीन समाधान भए पनि तत्काल प्रभाव सीमित रह्यो।",
+                    en: "Announced national industry establishment campaign to create domestic employment. Though long-term solution, immediate impact remained limited."
+                },
+                isConstitutional: true,
+                effects: { 
+                    stability: 10, morale: 20, stress: 10,
+                    economy: 25, business: 30, youth: 20,
+                    workers_abroad: 10, nationalism: 15,
+                    short_term_economy: -5
+                }
+            },
+            {
+                text: {
+                    ne: "कृषि क्रान्ति - खाद्य निर्यातक राष्ट्र बनाउने",
+                    en: "Agricultural revolution - become food exporting nation"
+                },
+                outcome: {
+                    ne: "आधुनिक कृषि प्रविधि र बजारीकरणमार्फत नेपाललाई खाद्य निर्यातक बनाउने महत्वाकांक्षी योजना घोषणा गर्नुभयो। किसानहरूले उत्साह देखाए।",
+                    en: "Announced ambitious plan to make Nepal food exporter through modern agricultural technology and commercialization. Farmers showed enthusiasm."
+                },
+                isConstitutional: true,
+                effects: { 
+                    stability: 15, morale: 25, stress: 5,
+                    farmers: 35, rural: 30, food_security: 25,
+                    economy: 20, traditional: 20,
+                    urban_employment: -5
+                }
+            },
+            {
+                text: {
+                    ne: "शिक्षा र सीप विकास - दक्ष जनशक्ति तयार गर्ने",
+                    en: "Education and skill development - prepare skilled workforce"
+                },
+                outcome: {
+                    ne: "तत्काल सीप विकास कार्यक्रम र गुणस्तरीय शिक्षामार्फत दक्ष जनशक्ति तयार गर्ने दीर्घकालीन रणनीति अपनाउनुभयो। शिक्षकहरूले स्वागत गरे।",
+                    en: "Adopted long-term strategy of immediate skill development program and quality education to prepare skilled workforce. Teachers welcomed it."
+                },
+                isConstitutional: true,
+                effects: { 
+                    stability: 20, morale: 30, stress: 5,
+                    education: 35, youth: 30, future_prospects: 35,
+                    skilled_workers: 25, international: 15,
+                    immediate_economic_pressure: 5
+                }
+            },
+            {
+                text: {
+                    ne: "विदेशी लगानी आकर्षण - चिनियाँ र भारतीय कम्पनी ल्याउने",
+                    en: "Attract foreign investment - bring Chinese and Indian companies"
+                },
+                outcome: {
+                    ne: "ठूला विदेशी लगानीकर्ताहरूलाई नेपालमा कम्पनी स्थापना गर्न आमन्त्रण दिनुभयो। व्यापारीहरूले खुशी मनाए तर राष्ट्रवादीहरूले चिन्ता जनाए।",
+                    en: "Invited big foreign investors to establish companies in Nepal. Businesspeople celebrated but nationalists expressed concerns."
+                },
+                isConstitutional: true,
+                effects: { 
+                    stability: 5, morale: 15, stress: 15,
+                    business: 30, foreign_relations: 20, economy: 20,
+                    nationalism: -25, sovereignty_concerns: 30,
+                    domestic_business: -10
+                }
+            }
+        ]
+    },
+
+    {
+        id: "caste_discrimination_dalits",
+        title: {
+            ne: "जातीय भेदभाव र दलित अधिकार",
+            en: "Caste Discrimination and Dalit Rights"
+        },
+        description: {
+            ne: "नेपालमा अझै पनि दलितहरूले सामाजिक, आर्थिक र राजनीतिक भेदभाव भोगिरहेका छन्। पानी नछुने, मन्दिर प्रवेश नदिने, अन्तरजातीय विवाहमा हिंसा जस्ता घटनाहरू जारी छन्। संविधानले समानताको ग्यारेन्टी दिए पनि व्यवहारमा कार्यान्वयन भएको छैन।",
+            en: "Dalits still face social, economic and political discrimination in Nepal. Events like water untouchability, temple entry denial, violence in inter-caste marriage continue. Though constitution guarantees equality, not implemented in practice."
+        },
+        type: "social_justice",
+        complexity: "extreme",
+        baseWeight: 0.9,
+        realWorldEvent: true,
+        socialIssue: "caste discrimination",
+        
+        choices: [
+            {
+                text: {
+                    ne: "कठोर कानून बनाउने - जातीय भेदभावमा जेल सजाय",
+                    en: "Make strict law - jail sentence for caste discrimination"
+                },
+                outcome: {
+                    ne: "जातीय भेदभाव गर्नेलाई अनिवार्य जेल सजायको कानून बनाउनुभयो। दलित संगठनहरूले स्वागत गरे तर उच्च जातिका केहीले विरोध जनाए।",
+                    en: "Made law of mandatory jail sentence for those practicing caste discrimination. Dalit organizations welcomed but some upper castes protested."
+                },
+                isConstitutional: true,
+                effects: { 
+                    stability: 10, morale: 20, stress: 15,
+                    dalits: 40, social_justice: 35, civil_society: 25,
+                    traditional_upper_caste: -25, conservative: -20
+                }
+            },
+            {
+                text: {
+                    ne: "शिक्षामार्फत चेतना जगाउने - लामो अवधिको समाधान",
+                    en: "Raise awareness through education - long-term solution"
+                },
+                outcome: {
+                    ne: "शिक्षा पाठ्यक्रममा जातीय समानताको पाठ अनिवार्य बनाएर दीर्घकालीन समाधानको बाटो रोज्नुभयो। सबैले मानवीय भने तर दलितहरूले ढिलो लाग्यो।",
+                    en: "Chose long-term solution path by making caste equality lessons mandatory in education curriculum. Everyone called it humane but Dalits felt it slow."
+                },
+                isConstitutional: true,
+                effects: { 
+                    stability: 20, morale: 15, stress: 5,
+                    education: 25, long_term_change: 35, moderate: 20,
+                    dalits: 10, immediate_justice_seekers: -10
+                }
+            },
+            {
+                text: {
+                    ne: "आर्थिक सशक्तिकरण - दलितका लागि विशेष कोटा र व्यापार सहुलियत",
+                    en: "Economic empowerment - special quota and business facilities for Dalits"
+                },
+                outcome: {
+                    ne: "सरकारी जागिर र व्यापारमा दलितहरूका लागि विशेष कोटा र सहुलियतको घोषणा गर्नुभयो। आर्थिक सशक्तिकरणको बाटो खुल्यो तर योग्यताको बहस सुरु भयो।",
+                    en: "Announced special quota and facilities for Dalits in government jobs and business. Path of economic empowerment opened but merit debate started."
+                },
+                isConstitutional: true,
+                effects: { 
+                    stability: 15, morale: 25, stress: 10,
+                    dalits: 35, economic_inclusion: 30, affirmative_action: 25,
+                    merit_believers: -20, general_category: -15
+                }
+            },
+            {
+                text: {
+                    ne: "धर्म र परम्परामा हस्तक्षेप नगर्ने - स्वतन्त्रताको पक्षमा",
+                    en: "Don't interfere in religion and tradition - for freedom"
+                },
+                outcome: {
+                    ne: "धार्मिक स्वतन्त्रता र सांस्कृतिक अधिकारको नाममा जातीय परम्परामा हस्तक्षेप नगर्ने निर्णय गर्नुभयो। धार्मिकहरूले राम्रो भने तर मानवअधिकारकर्मीहरूले आलोचना गरे।",
+                    en: "Decided not to interfere in caste traditions in name of religious freedom and cultural rights. Religious people liked it but human rights activists criticized."
+                },
+                isConstitutional: false,
+                effects: { 
+                    stability: 5, morale: -10, stress: 25,
+                    religious_conservatives: 30, traditional: 25,
+                    dalits: -40, human_rights: -35, international: -25
+                }
+            }
+        ]
     }
 
 ];
