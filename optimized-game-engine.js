@@ -9895,66 +9895,116 @@ class OptimizedRealTimeEngine {
         console.log('🎲 Total events available:', pool.length);
         console.log('🎲 Used events:', gameState.usedEvents.length, gameState.usedEvents);
         
-        // First get character-specific + generic events
-        const characterEvents = pool.filter(event => 
-            event.characterSpecific === gameState.character || !event.characterSpecific
+        // IMPROVED ALGORITHM: Smart character-specific prioritization with cross-character variety
+        
+        // 1. Get character-specific events
+        const characterSpecific = pool.filter(event => 
+            event.characterSpecific === gameState.character
         );
         
-        console.log('🎯 Character-specific + generic events available:', characterEvents.length);
+        // 2. Get cross-character/universal events (no characterSpecific property or explicitly universal)
+        const crossCharacter = pool.filter(event => 
+            !event.characterSpecific || 
+            (Array.isArray(event.characterSpecific) && event.characterSpecific.includes(gameState.character)) ||
+            event.type === 'constitutional' || 
+            event.type === 'foreign_policy' ||
+            event.type === 'economic_policy' ||
+            event.type === 'historical_reflection'
+        );
         
-        // IMPROVED ALGORITHM: Dynamic exclusion based on pool size
-        const totalCharacterEvents = characterEvents.length;
+        console.log('🎯 Character-specific events:', characterSpecific.length);
+        console.log('🌐 Cross-character/universal events:', crossCharacter.length);
+        
+        // 3. Smart balancing algorithm - ensure variety while prioritizing character content
+        let targetPool = [];
+        
+        // Strategy: Use 70% character-specific, 30% cross-character for variety
+        const characterRatio = 0.7;
+        const totalDesired = Math.min(20, characterSpecific.length + crossCharacter.length);
+        
+        const characterTarget = Math.floor(totalDesired * characterRatio);
+        const crossTarget = totalDesired - characterTarget;
+        
+        // Add character-specific events (prioritized)
+        targetPool.push(...characterSpecific.slice(0, characterTarget));
+        
+        // Add cross-character events for variety
+        targetPool.push(...crossCharacter.slice(0, crossTarget));
+        
+        // If we don't have enough character-specific, fill with more cross-character
+        if (targetPool.length < totalDesired && crossCharacter.length > crossTarget) {
+            const remaining = totalDesired - targetPool.length;
+            targetPool.push(...crossCharacter.slice(crossTarget, crossTarget + remaining));
+        }
+        
+        console.log('🎯 Smart mixed pool created:', targetPool.length, 
+                   `(${targetPool.filter(e => e.characterSpecific === gameState.character).length} character-specific, 
+                    ${targetPool.filter(e => !e.characterSpecific || e.characterSpecific !== gameState.character).length} cross-character)`);
+        
+        // 4. IMPROVED EXCLUSION: Category-aware filtering to prevent repetition
+        const totalPoolSize = targetPool.length;
         let eventsToExclude;
         
-        // Dynamic exclusion window based on available events
-        if (totalCharacterEvents <= 8) {
-            eventsToExclude = Math.min(1, gameState.usedEvents.length); // Very small pool - exclude only 1
-        } else if (totalCharacterEvents <= 15) {
-            eventsToExclude = Math.min(3, gameState.usedEvents.length); // Small pool - exclude 3
-        } else if (totalCharacterEvents <= 30) {
-            eventsToExclude = Math.min(5, gameState.usedEvents.length); // Medium pool - exclude 5
+        // Dynamic exclusion window that ensures variety
+        if (totalPoolSize <= 8) {
+            eventsToExclude = Math.min(2, gameState.usedEvents.length);
+        } else if (totalPoolSize <= 15) {
+            eventsToExclude = Math.min(4, gameState.usedEvents.length);
+        } else if (totalPoolSize <= 25) {
+            eventsToExclude = Math.min(6, gameState.usedEvents.length);
         } else {
-            eventsToExclude = Math.min(8, gameState.usedEvents.length); // Large pool - exclude 8
+            eventsToExclude = Math.min(10, gameState.usedEvents.length);
         }
         
         const recentlyUsed = gameState.usedEvents.slice(-eventsToExclude);
-        console.log(`🎲 Dynamic exclusion: ${eventsToExclude} events from pool of ${totalCharacterEvents}`);
+        console.log(`🎲 Smart exclusion: ${eventsToExclude} events from pool of ${totalPoolSize}`);
         
-        // Apply smart filtering with fallback strategy
-        let availablePool = characterEvents.filter(event => 
+        // 5. Apply filtering with category diversity fallback
+        let availablePool = targetPool.filter(event => 
             !recentlyUsed.includes(event.id)
         );
         
         console.log('🎲 Pool after smart filtering:', availablePool.length);
         console.log('🎲 Recently used events (excluded):', recentlyUsed);
         
-        // SMART FALLBACK SYSTEM
+        // 6. ENHANCED FALLBACK SYSTEM with category balancing
         if (availablePool.length === 0) {
-            console.log('🎲 Smart fallback: No events available after filtering');
+            console.log('🎲 Enhanced fallback: No events available after filtering');
             
-            // Fallback 1: Use all character events except the very last one
-            if (gameState.usedEvents.length > 0) {
-                const lastUsed = gameState.usedEvents.slice(-1);
-                availablePool = characterEvents.filter(event => 
-                    !lastUsed.includes(event.id)
+            // Fallback 1: Try different event categories
+            const eventCategories = ['economic_policy', 'social_justice', 'historical_reflection', 'foreign_policy', 'constitutional'];
+            for (const category of eventCategories) {
+                const categoryEvents = targetPool.filter(event => 
+                    event.type === category && !gameState.usedEvents.slice(-2).includes(event.id)
                 );
-                console.log('🎲 Fallback 1: Excluding only last event, available:', availablePool.length);
+                if (categoryEvents.length > 0) {
+                    availablePool = categoryEvents;
+                    console.log(`🎲 Fallback 1: Using ${category} category events:`, availablePool.length);
+                    break;
+                }
             }
             
-            // Fallback 2: If still empty, use ALL character events (complete reset)
+            // Fallback 2: Use all events except the very last one
+            if (availablePool.length === 0 && gameState.usedEvents.length > 0) {
+                const lastUsed = gameState.usedEvents.slice(-1);
+                availablePool = targetPool.filter(event => 
+                    !lastUsed.includes(event.id)
+                );
+                console.log('🎲 Fallback 2: Excluding only last event, available:', availablePool.length);
+            }
+            
+            // Fallback 3: Complete reset with warning
             if (availablePool.length === 0) {
-                availablePool = [...characterEvents];
-                console.log('🎲 Fallback 2: Using all character events (reset cycle)');
+                availablePool = [...targetPool];
+                console.log('🎲 Fallback 3: Complete reset - using all events');
                 
-                // Reset the used events tracker to prevent infinite exclusion
-                gameState.usedEvents = [];
-                console.log('🎲 Resetting usedEvents tracker for fresh cycle');
+                // Partial reset - keep only last 3 used events to prevent immediate repetition
+                gameState.usedEvents = gameState.usedEvents.slice(-3);
+                console.log('🎲 Partial reset of usedEvents tracker');
             }
         }
         
-        pool = availablePool;
-        
-        return pool;
+        return availablePool;
     }
     
     displayEvent(event) {

@@ -357,12 +357,14 @@
             color: var(--text-light);
             cursor: pointer;
             transition: all 0.2s ease;
+            user-select: none;
         }
         
         .star:hover,
         .star.active {
             color: #fbbf24;
             transform: scale(1.1);
+            text-shadow: 0 0 10px #fbbf24;
         }
         
         .yes-no-buttons {
@@ -886,15 +888,74 @@
                     
                     <div class="rating-item">
                         <div class="rating-question">
+                            <i class="fas fa-user-tie" style="color: var(--warning-color);"></i>
+                            दलाल (बिचौलिया) प्रयोग गर्नुपर्यो?
+                        </div>
+                        <div class="yes-no-buttons">
+                            <div class="yes-no-btn danger" data-dalaal="yes">
+                                गर्नुपर्यो 😤
+                            </div>
+                            <div class="yes-no-btn" data-dalaal="no">
+                                आवश्यक भएन 👍
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="rating-item">
+                        <div class="rating-question">
+                            <i class="fas fa-file-alt" style="color: var(--warning-color);"></i>
+                            अनावश्यक कागजात माग्यो?
+                        </div>
+                        <div class="yes-no-buttons">
+                            <div class="yes-no-btn danger" data-unnecessary="yes">
+                                धेरै फालतु 📄
+                            </div>
+                            <div class="yes-no-btn" data-unnecessary="no">
+                                उचित मात्र ✅
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="rating-item">
+                        <div class="rating-question">
+                            <i class="fas fa-database" style="color: var(--info-color);"></i>
+                            सरकारसँग भएको डाटा फेरि माग्यो?
+                        </div>
+                        <div class="yes-no-buttons">
+                            <div class="yes-no-btn danger" data-redundant="yes">
+                                फेरि भर्नुपर्यो 😑
+                            </div>
+                            <div class="yes-no-btn" data-redundant="no">
+                                स्वतः भरिएको 🚀
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="rating-item">
+                        <div class="rating-question">
                             <i class="fas fa-users" style="color: var(--info-color);"></i>
                             कर्मचारीको व्यवहार कस्तो थियो?
                         </div>
                         <div class="star-rating" data-rating="staff">
-                            <span class="star" data-value="1">⭐</span>
-                            <span class="star" data-value="2">⭐</span>
-                            <span class="star" data-value="3">⭐</span>
-                            <span class="star" data-value="4">⭐</span>
-                            <span class="star" data-value="5">⭐</span>
+                            <span class="star" data-value="1">★</span>
+                            <span class="star" data-value="2">★</span>
+                            <span class="star" data-value="3">★</span>
+                            <span class="star" data-value="4">★</span>
+                            <span class="star" data-value="5">★</span>
+                        </div>
+                    </div>
+                    
+                    <div class="rating-item">
+                        <div class="rating-question">
+                            <i class="fas fa-cogs" style="color: var(--primary-color);"></i>
+                            प्रक्रिया कति सजिलो थियो?
+                        </div>
+                        <div class="star-rating" data-rating="process">
+                            <span class="star" data-value="1">★</span>
+                            <span class="star" data-value="2">★</span>
+                            <span class="star" data-value="3">★</span>
+                            <span class="star" data-value="4">★</span>
+                            <span class="star" data-value="5">★</span>
                         </div>
                     </div>
                 </div>
@@ -968,7 +1029,11 @@
             service: '',
             mood: '',
             bribeAsked: '',
+            dalaalNeeded: '',
+            unnecessaryDocs: '',
+            redundantData: '',
             staffRating: 0,
+            processRating: 0,
             comment: '',
             duration: '',
             outcome: ''
@@ -1125,6 +1190,11 @@
                 <p><strong>परिणाम:</strong> ${outcomeText[trackingData.outcome] || trackingData.outcome}</p>
                 <p><strong>मुड:</strong> ${moodText[trackingData.mood] || 'नछानिएको'}</p>
                 <p><strong>घुस:</strong> ${trackingData.bribeAsked === 'yes' ? '😠 माग्यो' : trackingData.bribeAsked === 'no' ? '😊 मागेन' : 'नछानिएको'}</p>
+                <p><strong>दलाल:</strong> ${trackingData.dalaalNeeded === 'yes' ? '😤 प्रयोग गर्नुपर्यो' : trackingData.dalaalNeeded === 'no' ? '👍 आवश्यक भएन' : 'नछानिएको'}</p>
+                <p><strong>अनावश्यक कागजात:</strong> ${trackingData.unnecessaryDocs === 'yes' ? '📄 धेरै फालतु' : trackingData.unnecessaryDocs === 'no' ? '✅ उचित मात्र' : 'नछानिएको'}</p>
+                <p><strong>फेरि डाटा भर्नुपर्यो:</strong> ${trackingData.redundantData === 'yes' ? '😑 फेरि भर्नुपर्यो' : trackingData.redundantData === 'no' ? '🚀 स्वतः भरिएको' : 'नछानिएको'}</p>
+                <p><strong>कर्मचारी व्यवहार:</strong> ${trackingData.staffRating ? '⭐'.repeat(trackingData.staffRating) : 'मूल्याङ्कन भएन'}</p>
+                <p><strong>प्रक्रिया सजिलो:</strong> ${trackingData.processRating ? '⭐'.repeat(trackingData.processRating) : 'मूल्याङ्कन भएन'}</p>
                 ${trackingData.comment ? `<p><strong>टिप्पणी:</strong> ${trackingData.comment}</p>` : ''}
             `;
         }
@@ -1139,7 +1209,11 @@
                 service: '',
                 mood: '',
                 bribeAsked: '',
+                dalaalNeeded: '',
+                unnecessaryDocs: '',
+                redundantData: '',
                 staffRating: 0,
+                processRating: 0,
                 comment: '',
                 duration: '',
                 outcome: ''
@@ -1246,12 +1320,36 @@
             }
         });
         
-        // Bribe question handlers
+        // Question handlers for all yes/no questions
         document.querySelectorAll('[data-bribe]').forEach(btn => {
             btn.addEventListener('click', function() {
                 document.querySelectorAll('[data-bribe]').forEach(b => b.classList.remove('selected'));
                 this.classList.add('selected');
                 trackingData.bribeAsked = this.dataset.bribe;
+            });
+        });
+        
+        document.querySelectorAll('[data-dalaal]').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('[data-dalaal]').forEach(b => b.classList.remove('selected'));
+                this.classList.add('selected');
+                trackingData.dalaalNeeded = this.dataset.dalaal;
+            });
+        });
+        
+        document.querySelectorAll('[data-unnecessary]').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('[data-unnecessary]').forEach(b => b.classList.remove('selected'));
+                this.classList.add('selected');
+                trackingData.unnecessaryDocs = this.dataset.unnecessary;
+            });
+        });
+        
+        document.querySelectorAll('[data-redundant]').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('[data-redundant]').forEach(b => b.classList.remove('selected'));
+                this.classList.add('selected');
+                trackingData.redundantData = this.dataset.redundant;
             });
         });
         
@@ -1263,8 +1361,15 @@
             stars.forEach(star => {
                 star.addEventListener('click', function() {
                     const value = parseInt(this.dataset.value);
-                    trackingData.staffRating = value;
                     
+                    // Update tracking data based on rating type
+                    if (ratingType === 'staff') {
+                        trackingData.staffRating = value;
+                    } else if (ratingType === 'process') {
+                        trackingData.processRating = value;
+                    }
+                    
+                    // Update visual state
                     stars.forEach((s, index) => {
                         if (index < value) {
                             s.classList.add('active');
