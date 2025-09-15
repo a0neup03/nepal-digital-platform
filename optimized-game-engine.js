@@ -10143,9 +10143,7 @@ class OptimizedRealTimeEngine {
     
     createOptimizedChoiceCard(choice, index) {
         const card = document.createElement('div');
-        card.className = `event-card p-4 border-2 rounded-lg cursor-pointer ${
-            choice.isConstitutional === false ? 'border-red-300 bg-red-50' : 'border-green-300 bg-green-50'
-        }`;
+        card.className = 'modern-choice-card';
         
         const lang = gameState.currentLanguage;
         const choiceText = typeof choice.text === 'object' ? choice.text[lang] : choice.text;
@@ -10153,25 +10151,33 @@ class OptimizedRealTimeEngine {
         
         const successRate = this.calculateSuccessRate(choice);
         
+        // Shorten text for better readability (max 80 characters for title, 120 for description)
+        const shortChoiceText = choiceText.length > 80 ? choiceText.substring(0, 77) + '...' : choiceText;
+        const shortOutcome = choiceOutcome.length > 120 ? choiceOutcome.substring(0, 117) + '...' : choiceOutcome;
+        
+        // Choice icons based on content/effects
+        const choiceIcon = this.getChoiceIcon(choice, index);
+        
+        // Probability badge styling
+        const probabilityClass = successRate > 70 ? 'probability-high' : successRate > 40 ? 'probability-medium' : 'probability-low';
+        
         card.innerHTML = `
-            <div class="flex items-start justify-between mb-2">
-                <p class="font-bold text-gray-800">${choiceText}</p>
-                <span class="text-xs px-2 py-1 rounded ${
-                    successRate > 70 ? 'bg-green-200 text-green-800' :
-                    successRate > 40 ? 'bg-yellow-200 text-yellow-800' :
-                    'bg-red-200 text-red-800'
-                }">
-                    ${successRate}% ${t('success_chance')}
-                </span>
-            </div>
-            <p class="text-sm text-gray-600 mb-3">${choiceOutcome}</p>
-            <div class="flex items-center justify-between">
+            <div class="choice-icon">${choiceIcon}</div>
+            <div class="choice-title">${shortChoiceText}</div>
+            <div class="choice-description">${shortOutcome}</div>
+            
+            <div class="flex items-center justify-between mt-4">
                 <div class="flex items-center space-x-2">
-                    ${this.createEffectPreview(choice.effects)}
+                    ${this.createModernEffectPreview(choice.effects)}
                 </div>
-                <span class="text-xs ${choice.isConstitutional === false ? 'text-red-600' : 'text-green-600'}">
-                    ${choice.isConstitutional === false ? '⚠️ ' + t('unconstitutional') : '✅ ' + t('constitutional')}
-                </span>
+                <div class="flex items-center space-x-2">
+                    <span class="text-xs px-3 py-1 rounded-full text-white font-semibold ${probabilityClass}">
+                        ${successRate}%
+                    </span>
+                    <span class="text-xs px-2 py-1 rounded-full ${choice.isConstitutional === false ? 'bg-red-500 text-white' : 'bg-green-500 text-white'}">
+                        ${choice.isConstitutional === false ? '⚠️' : '✅'}
+                    </span>
+                </div>
             </div>
         `;
         
@@ -10215,6 +10221,78 @@ class OptimizedRealTimeEngine {
         if (gameState.politicalCapital > 100) baseRate += 10;
         
         return Math.max(10, Math.min(90, Math.round(baseRate)));
+    }
+    
+    getChoiceIcon(choice, index) {
+        // Smart icon selection based on choice content and effects
+        const text = (typeof choice.text === 'object' ? choice.text.ne || choice.text.en : choice.text).toLowerCase();
+        const effects = choice.effects || {};
+        
+        // Political/Government icons
+        if (text.includes('संसद') || text.includes('विपक्षी') || text.includes('सत्तापक्ष')) return '🏛️';
+        if (text.includes('चुनाव') || text.includes('मतदान')) return '🗳️';
+        if (text.includes('संविधान') || text.includes('कानून')) return '⚖️';
+        if (text.includes('जनता') || text.includes('नागरिक')) return '👥';
+        
+        // Economic icons
+        if (text.includes('बजेट') || text.includes('कर') || text.includes('आर्थिक')) return '💰';
+        if (text.includes('विकास') || text.includes('निर्माण')) return '🏗️';
+        if (text.includes('व्यापार') || text.includes('उद्योग')) return '🏭';
+        
+        // Social issues
+        if (text.includes('शिक्षा') || text.includes('विद्यालय')) return '📚';
+        if (text.includes('स्वास्थ्य') || text.includes('अस्पताल')) return '🏥';
+        if (text.includes('यातायात') || text.includes('सडक')) return '🚗';
+        
+        // Corruption/Ethics
+        if (text.includes('भ्रष्टाचार') || text.includes('घुस')) return '💸';
+        if (text.includes('न्याय') || text.includes('अदालत')) return '⚖️';
+        
+        // Default icons by choice position
+        const defaultIcons = ['🎯', '🤔', '💡', '⚡', '🌟', '🔧'];
+        return defaultIcons[index % defaultIcons.length];
+    }
+    
+    createModernEffectPreview(effects) {
+        if (!effects) return '';
+        
+        const previews = [];
+        const maxEffects = 3; // Limit to 3 effects for clean design
+        let count = 0;
+        
+        for (let [key, value] of Object.entries(effects)) {
+            if (count >= maxEffects) break;
+            
+            let icon = '';
+            let color = '';
+            
+            switch (key) {
+                case 'stability':
+                    icon = value > 0 ? '📈' : '📉';
+                    color = value > 0 ? 'text-green-400' : 'text-red-400';
+                    break;
+                case 'economy':
+                    icon = value > 0 ? '💰' : '💸';
+                    color = value > 0 ? 'text-green-400' : 'text-red-400';
+                    break;
+                case 'morale':
+                    icon = value > 0 ? '😊' : '😔';
+                    color = value > 0 ? 'text-green-400' : 'text-red-400';
+                    break;
+                case 'corruption':
+                    icon = value > 0 ? '🔥' : '✨';
+                    color = value > 0 ? 'text-red-400' : 'text-green-400';
+                    break;
+                default:
+                    icon = value > 0 ? '⬆️' : '⬇️';
+                    color = value > 0 ? 'text-green-400' : 'text-red-400';
+            }
+            
+            previews.push(`<span class="text-sm ${color}" title="${key}: ${value > 0 ? '+' : ''}${value}">${icon}</span>`);
+            count++;
+        }
+        
+        return previews.join(' ');
     }
     
     createEffectPreview(effects) {
@@ -10460,23 +10538,33 @@ class OptimizedRealTimeEngine {
         notification.style.animation = 'slideIn 0.3s ease-out forwards';
         
         notification.innerHTML = `
-            <div class="p-6">
-                <div class="flex items-center justify-between mb-4">
-                    <div class="flex items-center space-x-2">
-                        <span class="text-2xl">${statusIcon}</span>
-                        <span class="font-bold text-lg ${isSuccess ? 'text-green-400' : 'text-yellow-400'}">
+            <div class="p-8">
+                <div class="flex items-center justify-between mb-6">
+                    <div class="flex items-center space-x-3">
+                        <span class="text-4xl">${statusIcon}</span>
+                        <span class="font-bold text-xl ${isSuccess ? 'text-green-400' : 'text-yellow-400'}">
                             ${statusText}
                         </span>
                     </div>
-                    <div class="text-sm text-gray-400 font-mono">
-                        निर्णय #${questionNumber}
+                    <div class="text-sm text-gray-300 font-mono bg-gray-700 px-3 py-1 rounded">
+                        प्रश्न #${questionNumber}
                     </div>
                 </div>
-                <div class="text-white text-base leading-relaxed mb-4">
+                <div class="text-white text-lg leading-relaxed mb-6 font-medium">
                     ${outcome}
                 </div>
-                <div class="text-xs text-gray-400 text-center">
-                    नयाँ घटना तयारी गरिँदै... (3 सेकेन्ड)
+                <div class="mb-4">
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="text-sm text-gray-400">
+                            📊 नतिजा पढ्न ७ सेकेन्ड मिल्छ
+                        </div>
+                        <div class="text-xs text-blue-400 cursor-pointer hover:text-blue-300" onclick="this.closest('.fixed').remove()">
+                            ✕ बन्द गर्नुहोस्
+                        </div>
+                    </div>
+                    <div class="w-full bg-gray-700 rounded-full h-2 overflow-hidden">
+                        <div class="bg-gradient-to-r ${isSuccess ? 'from-green-500 to-green-400' : 'from-yellow-500 to-yellow-400'} h-full rounded-full transition-all duration-75 reading-progress" style="width: 100%"></div>
+                    </div>
                 </div>
             </div>
         `;
@@ -10490,8 +10578,38 @@ class OptimizedRealTimeEngine {
             notification.style.transform = 'scale(1)';
         }, 10);
         
+        // Animate progress bar countdown with pause on hover
+        const progressBar = notification.querySelector('.reading-progress');
+        let progress = 100;
+        let isPaused = false;
+        
+        const progressInterval = setInterval(() => {
+            if (!isPaused) {
+                progress -= (100 / 70); // Decrease over 7 seconds (70 * 100ms = 7000ms)
+                if (progress <= 0) {
+                    progress = 0;
+                    clearInterval(progressInterval);
+                }
+                if (progressBar) {
+                    progressBar.style.width = progress + '%';
+                }
+            }
+        }, 100);
+        
+        // Pause countdown on hover for better UX
+        notification.addEventListener('mouseenter', () => {
+            isPaused = true;
+            progressBar.style.opacity = '0.5';
+        });
+        
+        notification.addEventListener('mouseleave', () => {
+            isPaused = false;
+            progressBar.style.opacity = '1';
+        });
+        
         // Remove after delay with smooth transition
         setTimeout(() => {
+            clearInterval(progressInterval); // Clean up interval
             overlay.style.opacity = '0';
             notification.style.transform = 'scale(0.95)';
             setTimeout(() => {
@@ -10499,7 +10617,7 @@ class OptimizedRealTimeEngine {
                     overlay.remove();
                 }
             }, 300);
-        }, 2700); // Show for 2.7 seconds, then 0.3s transition
+        }, 7000); // Show for 7 seconds, then 0.3s transition for better readability
     }
     
     checkGameEnd() {

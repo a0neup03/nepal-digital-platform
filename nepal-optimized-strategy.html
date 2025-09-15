@@ -297,6 +297,165 @@
         /* Professional news-style question numbering */
         .question-header {
             background: linear-gradient(90deg, #003893, #DC143C);
+        }
+        
+        /* Modern Design Enhancements */
+        .text-gradient {
+            background: linear-gradient(135deg, #003893 0%, #DC143C 50%, #FFD700 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .border-gradient {
+            border-image: linear-gradient(45deg, #003893, #DC143C, #FFD700) 1;
+        }
+        
+        /* Enhanced Character Portrait */
+        #eventImage {
+            transition: all 0.3s ease;
+            filter: brightness(1.1) contrast(1.1);
+        }
+        
+        #eventImage:hover {
+            transform: scale(1.05);
+            box-shadow: 0 15px 35px rgba(0, 56, 147, 0.3);
+        }
+        
+        /* Modern Choice Cards */
+        .modern-choice-card {
+            background: linear-gradient(135deg, var(--choice-bg) 0%, rgba(51, 65, 85, 0.8) 100%);
+            border: 2px solid transparent;
+            border-radius: 16px;
+            padding: 20px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .modern-choice-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: left 0.5s ease;
+        }
+        
+        .modern-choice-card:hover {
+            border-color: #003893;
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(0, 56, 147, 0.25);
+        }
+        
+        .modern-choice-card:hover::before {
+            left: 100%;
+        }
+        
+        .choice-icon {
+            font-size: 2rem;
+            margin-bottom: 12px;
+            display: block;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+        }
+        
+        .choice-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
+        
+        .choice-description {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+        
+        /* Probability indicators */
+        .probability-high { background: linear-gradient(135deg, #10b981, #059669); }
+        .probability-medium { background: linear-gradient(135deg, #f59e0b, #d97706); }
+        .probability-low { background: linear-gradient(135deg, #ef4444, #dc2626); }
+        
+        /* Category badges */
+        .category-political { background: linear-gradient(135deg, #003893, #1e40af); }
+        .category-economic { background: linear-gradient(135deg, #059669, #047857); }
+        .category-social { background: linear-gradient(135deg, #7c3aed, #6d28d9); }
+        .category-corruption { background: linear-gradient(135deg, #dc2626, #b91c1c); }
+        
+        /* ENTERPRISE GRADE TEXT READABILITY - MAXIMUM CONTRAST */
+        .choice-title {
+            color: #ffffff !important; /* Pure white for maximum contrast */
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8) !important; /* Strong shadow for visibility */
+            font-weight: 700 !important;
+            font-size: 1.1rem !important;
+        }
+        
+        .choice-description {
+            color: #f1f5f9 !important; /* Near-white for readability */
+            text-shadow: 0 1px 3px rgba(0,0,0,0.7) !important;
+            line-height: 1.6;
+            font-size: 0.95rem !important;
+        }
+        
+        /* CRITICAL: Remove gradient text that's unreadable */
+        .text-gradient, #eventTitle.text-gradient {
+            background: none !important;
+            -webkit-background-clip: unset !important;
+            -webkit-text-fill-color: unset !important;
+            background-clip: unset !important;
+            color: #ffffff !important; /* Pure white instead of gradient */
+            text-shadow: 0 3px 6px rgba(0,0,0,0.9) !important;
+            font-weight: 800 !important;
+        }
+        
+        /* Constitutional validity and critical text */
+        .constitutional-badge, .event-context, #contextText, #eventDescription {
+            color: #ffffff !important;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8) !important;
+            font-weight: 500 !important;
+        }
+        
+        /* Premium question title readability */
+        #eventTitle {
+            color: #ffffff !important;
+            text-shadow: 0 3px 6px rgba(0,0,0,0.9) !important;
+            font-weight: 800 !important;
+            font-size: 2rem !important;
+        }
+        
+        /* Enhanced contrast for all text elements */
+        .text-primary, [style*="var(--text-primary)"] {
+            color: #ffffff !important;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.7) !important;
+        }
+        
+        .text-secondary, [style*="var(--text-secondary)"] {
+            color: #f1f5f9 !important;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.6) !important;
+        }
+        
+        /* Enhanced choice card backgrounds for better contrast */
+        .modern-choice-card {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.95) 0%, rgba(51, 65, 85, 0.95) 100%) !important;
+            border: 2px solid rgba(255, 255, 255, 0.1) !important;
+            backdrop-filter: blur(10px) !important;
+        }
+        
+        .modern-choice-card:hover {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 1) 0%, rgba(51, 65, 85, 1) 100%) !important;
+            border-color: #3b82f6 !important;
+        }
+        
+        /* Question container enhancement */
+        #currentEvent {
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 41, 59, 0.95) 100%) !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            backdrop-filter: blur(15px) !important;
+        }
             padding: 8px 16px;
             border-radius: 8px;
             margin-bottom: 16px;
@@ -497,6 +656,9 @@
         <div class="bg-gray-800 border-b border-gray-700 px-6 py-4">
             <div class="flex items-center justify-between">
                 <div class="flex items-center space-x-4">
+                    <a href="index.html" class="text-blue-400 hover:text-blue-300 transition-colors mr-2" title="मुख्य पृष्ठमा फर्कनुहोस्">
+                        <i class="fas fa-arrow-left text-xl"></i>
+                    </a>
                     <div class="text-3xl">🇳🇵</div>
                     <div>
                         <h1 class="text-2xl font-bold" data-i18n="game_title">नेपाल राजनीतिक रणनीति</h1>
@@ -591,24 +753,43 @@
             <!-- Event Panel -->
             <div class="flex-1 p-6">
                 <div id="currentEvent" class="event-card p-8 mb-6 gpu-accelerated" style="color: var(--text-primary);">
-                    <div class="flex items-start space-x-6">
-                        <img id="eventImage" class="w-32 h-24 object-cover rounded-lg shadow-md" src="" alt="घटना">
-                        <div class="flex-1">
-                            <div class="flex items-center justify-between mb-3">
-                                <h2 id="eventTitle" class="text-2xl font-bold">अर्को घटना लोड हुँदैछ...</h2>
-                                <div class="flex items-center space-x-2">
-                                    <span id="eventProbability" class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">गणना गर्दै...</span>
-                                    <span id="eventTimer" class="text-xs bg-gray-100 text-gray-800 px-2 py-1 rounded">00:00</span>
-                                </div>
+                    <!-- Modern Question Header with Character Portrait -->
+                    <div class="flex items-start space-x-6 mb-6">
+                        <div class="relative">
+                            <img id="eventImage" class="w-40 h-40 object-cover rounded-xl shadow-xl border-4 border-gradient" src="" alt="घटना">
+                            <div class="absolute -top-2 -right-2 bg-gradient-to-r from-blue-600 to-red-600 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">
+                                <span id="eventTimer">00:00</span>
                             </div>
-                            <p id="eventDescription" class="leading-relaxed mb-4" style="color: var(--text-secondary);"></p>
-                            <div id="eventContext" class="bg-blue-50 border-l-4 border-blue-400 p-3 mb-4 text-sm">
-                                <p id="contextText"></p>
+                        </div>
+                        <div class="flex-1">
+                            <!-- Question Number & Category -->
+                            <div class="flex items-center gap-3 mb-3">
+                                <div class="bg-gradient-to-r from-blue-600 to-red-600 text-white text-sm font-bold px-4 py-2 rounded-lg">
+                                    प्रश्न <span id="questionNumber">1</span>
+                                </div>
+                                <span id="eventCategory" class="bg-gray-700 text-gray-300 text-xs px-3 py-1 rounded-full">राजनीतिक</span>
+                                <span id="eventProbability" class="bg-yellow-500 text-black text-xs font-semibold px-3 py-1 rounded-full">गणना गर्दै...</span>
+                            </div>
+                            
+                            <!-- Clean, Shorter Title -->
+                            <h2 id="eventTitle" class="text-3xl font-bold mb-4 leading-tight text-gradient">अर्को घटना लोड हुँदैछ...</h2>
+                            
+                            <!-- Simplified Description -->
+                            <div id="eventDescription" class="text-lg leading-relaxed mb-4" style="color: var(--text-secondary);"></div>
+                            
+                            <!-- Context Card with Icon -->
+                            <div id="eventContext" class="bg-gradient-to-r from-blue-900/20 to-red-900/20 border border-blue-500/30 rounded-lg p-4 mb-4">
+                                <div class="flex items-start gap-3">
+                                    <div class="text-2xl">🎯</div>
+                                    <p id="contextText" class="text-sm font-medium"></p>
+                                </div>
                             </div>
                         </div>
                     </div>
+                    
+                    <!-- Modern Choice Cards Grid -->
                     <div id="choicesContainer" class="grid gap-4 mt-6">
-                        <!-- Choice cards populated by JS -->
+                        <!-- Choice cards populated by JS with new design -->
                     </div>
                 </div>
 

@@ -603,7 +603,7 @@
 </head>
 <body>
     <div class="container">
-        <a href="unified-nepal-platform.html" class="back-link">
+        <a href="index.html" class="back-link">
             <i class="fas fa-arrow-left"></i>
             मुख्य पृष्ठमा फर्कनुहोस्
         </a>
@@ -843,7 +843,7 @@
             <div class="step" id="step4">
                 <div class="step-header">
                     <div class="step-number">4</div>
-                    <h2 class="step-title">तपाईंको मन कस्तो छ?</h2>
+                    <h2 class="step-title">आज तपाईंलाई यहाँको काम कस्तो लाग्यो?</h2>
                     <p class="step-description">छिटो र सजिलो तरिकाले बताउनुहोस्</p>
                 </div>
                 
@@ -919,7 +919,7 @@
                     <div class="rating-item">
                         <div class="rating-question">
                             <i class="fas fa-database" style="color: var(--info-color);"></i>
-                            सरकारसँग भएको डाटा फेरि माग्यो?
+                            अन्य कार्यालयबाट लिएर आउनुपर्ने कागजात जुन उनीहरूसँग नै हुनुपर्ने थियो?
                         </div>
                         <div class="yes-no-buttons">
                             <div class="yes-no-btn danger" data-redundant="yes">
@@ -1038,6 +1038,186 @@
             duration: '',
             outcome: ''
         };
+        
+        // Services by office type - Smart filtering
+        const servicesByOfficeType = {
+            district_admin: [
+                {value: 'citizenship_new', text: '🆔 नागरिकता (नयाँ)'},
+                {value: 'citizenship_renew', text: '🆔 नागरिकता (नवीकरण)'},
+                {value: 'birth_certificate', text: '👶 जन्म दर्ता प्रमाणपत्र'},
+                {value: 'marriage_certificate', text: '💒 विवाह दर्ता प्रमाणपत्र'},
+                {value: 'death_certificate', text: '⚰️ मृत्यु दर्ता प्रमाणपत्र'},
+                {value: 'migration_certificate', text: '🏠 बसाइसराई प्रमाणपत्र'},
+                {value: 'character_certificate', text: '📜 चरित्र प्रमाणपत्र'}
+            ],
+            passport_office: [
+                {value: 'passport_new', text: '📘 राहदानी (नयाँ)'},
+                {value: 'passport_renew', text: '📘 राहदानी (नवीकरण)'},
+                {value: 'passport_lost', text: '📘 राहदानी (हराएको)'},
+                {value: 'passport_damage', text: '📘 राहदानी (बिग्रिएको)'}
+            ],
+            transport_office: [
+                {value: 'driving_license_new', text: '🚗 सवारी चालक अनुमतिपत्र (नयाँ)'},
+                {value: 'driving_license_renew', text: '🚗 सवारी चालक अनुमतिपत्र (नवीकरण)'},
+                {value: 'vehicle_registration', text: '📋 सवारी साधन दर्ता'},
+                {value: 'vehicle_transfer', text: '🔄 सवारी साधन स्वामित्व सारुवा'},
+                {value: 'license_duplicate', text: '📄 अनुमतिपत्र डुप्लिकेट'}
+            ],
+            land_registry: [
+                {value: 'land_ownership', text: '📜 जग्गाधनी प्रमाणपत्र'},
+                {value: 'land_registration', text: '🏞️ जग्गा दर्ता'},
+                {value: 'house_registration', text: '🏡 घर दर्ता'},
+                {value: 'property_transfer', text: '🔄 सम्पत्ति हस्तान्तरण'},
+                {value: 'land_mapping', text: '🗺️ नक्सा पास'},
+                {value: 'land_tax', text: '💰 मालपोत कर'}
+            ],
+            district_court: [
+                {value: 'civil_case', text: '⚖️ दिवानी मुद्दा'},
+                {value: 'criminal_case', text: '🚔 फौजदारी मुद्दा'},
+                {value: 'family_case', text: '👨‍👩‍👧‍👦 पारिवारिक मुद्दा'},
+                {value: 'bail_application', text: '🏃‍♂️ धरौट निवेदन'},
+                {value: 'court_certificate', text: '📋 अदालती प्रमाणपत्र'}
+            ],
+            district_health: [
+                {value: 'health_services', text: '🏥 स्वास्थ्य सेवा'},
+                {value: 'vaccination', text: '💉 खोप कार्यक्रम'},
+                {value: 'health_insurance', text: '🛡️ स्वास्थ्य बीमा'},
+                {value: 'medical_certificate', text: '📋 स्वास्थ्य प्रमाणपत्र'}
+            ],
+            district_education: [
+                {value: 'education_services', text: '📚 शैक्षिक सेवा'},
+                {value: 'scholarship', text: '🎓 छात्रवृत्ति'},
+                {value: 'school_registration', text: '🏫 विद्यालय दर्ता'},
+                {value: 'education_certificate', text: '📜 शैक्षिक प्रमाणपत्र'}
+            ],
+            ward_office: [
+                {value: 'ward_recommendation', text: '📋 वडा सिफारिस'},
+                {value: 'senior_citizen', text: '👴 ज्येष्ठ नागरिक परिचयपत्र'},
+                {value: 'poor_id', text: '🏚️ गरिब परिचयपत्र'},
+                {value: 'local_certificate', text: '📄 स्थानीय प्रमाणपत्र'}
+            ],
+            municipality: [
+                {value: 'business_license', text: '💼 व्यवसाय दर्ता'},
+                {value: 'building_permit', text: '🏗️ भवन निर्माण अनुमति'},
+                {value: 'tax_clearance', text: '💰 कर चुक्ता प्रमाणपत्र'},
+                {value: 'waste_management', text: '🗑️ फोहोर व्यवस्थापन'}
+            ],
+            rural_municipality: [
+                {value: 'agriculture_subsidy', text: '🌾 कृषि अनुदान'},
+                {value: 'rural_development', text: '🚜 ग्रामीण विकास'},
+                {value: 'cooperative_registration', text: '🤝 सहकारी दर्ता'},
+                {value: 'rural_certificate', text: '📜 ग्रामीण प्रमाणपत्र'}
+            ],
+            bank: [
+                {value: 'bank_account', text: '💳 बैंक खाता खोल्ने'},
+                {value: 'loan_application', text: '💰 ऋण निवेदन'},
+                {value: 'remittance', text: '💸 रेमिट्यान्स'},
+                {value: 'bank_certificate', text: '🏦 बैंक प्रमाणपत्र'}
+            ],
+            cooperative: [
+                {value: 'cooperative_membership', text: '🤝 सहकारी सदस्यता'},
+                {value: 'cooperative_loan', text: '💰 सहकारी ऋण'},
+                {value: 'cooperative_saving', text: '💰 सहकारी बचत'}
+            ],
+            police_station: [
+                {value: 'police_report', text: '🚔 प्रहरी रिपोर्ट'},
+                {value: 'character_verification', text: '👮 चरित्र प्रमाणीकरण'},
+                {value: 'lost_item_report', text: '📋 हराएको सामान रिपोर्ट'},
+                {value: 'police_clearance', text: '🛡️ प्रहरी क्लिरेन्स'}
+            ],
+            tax_office: [
+                {value: 'tax_registration', text: '📋 कर दर्ता'},
+                {value: 'tax_clearance', text: '💰 कर चुक्ता प्रमाणपत्र'},
+                {value: 'vat_registration', text: '📊 भ्याट दर्ता'}
+            ],
+            nagarik_app: [
+                {value: 'digital_services', text: '📱 डिजिटल सेवाहरू'},
+                {value: 'online_application', text: '💻 अनलाइन निवेदन'},
+                {value: 'app_support', text: '🛠️ एप सहयोग'}
+            ],
+            one_door_service: [
+                {value: 'integrated_service', text: '🚪 एकीकृत सेवा'},
+                {value: 'quick_service', text: '⚡ छिटो सेवा'},
+                {value: 'multiple_certificates', text: '📋 धेरै प्रमाणपत्र'}
+            ],
+            citizen_service: [
+                {value: 'citizen_support', text: '👥 नागरिक सहयोग'},
+                {value: 'information_service', text: 'ℹ️ सूचना सेवा'},
+                {value: 'complaint_service', text: '📢 गुनासो सेवा'}
+            ]
+        };
+        
+        // Smart service filtering function
+        function updateServiceOptions(officeType) {
+            const serviceSelect = document.getElementById('serviceSelect');
+            
+            // Clear current options
+            serviceSelect.innerHTML = '<option value="">सेवा छान्नुहोस्...</option>';
+            
+            if (officeType && servicesByOfficeType[officeType]) {
+                // Add office-specific services
+                servicesByOfficeType[officeType].forEach(service => {
+                    const option = document.createElement('option');
+                    option.value = service.value;
+                    option.textContent = service.text;
+                    serviceSelect.appendChild(option);
+                });
+                
+                // Add "Other" option
+                const otherOption = document.createElement('option');
+                otherOption.value = 'other';
+                otherOption.textContent = '📋 अन्य सेवा';
+                serviceSelect.appendChild(otherOption);
+                
+                serviceSelect.disabled = false;
+            } else {
+                // Reset to all services if no office type selected
+                serviceSelect.innerHTML = `
+                    <option value="">सेवा छान्नुहोस्...</option>
+                    <optgroup label="कागजातहरू">
+                        <option value="citizenship_new">🆔 नागरिकता (नयाँ)</option>
+                        <option value="citizenship_renew">🆔 नागरिकता (नवीकरण)</option>
+                        <option value="passport_new">📘 राहदानी (नयाँ)</option>
+                        <option value="passport_renew">📘 राहदानी (नवीकरण)</option>
+                        <option value="birth_certificate">👶 जन्म दर्ता प्रमाणपत्र</option>
+                        <option value="marriage_certificate">💒 विवाह दर्ता प्रमाणपत्र</option>
+                        <option value="death_certificate">⚰️ मृत्यु दर्ता प्रमाणपत्र</option>
+                        <option value="migration_certificate">🏠 बसाइसराई प्रमाणपत्र</option>
+                    </optgroup>
+                    <optgroup label="लाइसेन्स र अनुमतिपत्र">
+                        <option value="driving_license_new">🚗 सवारी चालक अनुमतिपत्र (नयाँ)</option>
+                        <option value="driving_license_renew">🚗 सवारी चालक अनुमतिपत्र (नवीकरण)</option>
+                        <option value="vehicle_registration">📋 सवारी साधन दर्ता</option>
+                        <option value="business_license">💼 व्यवसाय दर्ता</option>
+                        <option value="company_registration">🏢 कम्पनी दर्ता</option>
+                    </optgroup>
+                    <optgroup label="जग्गा सम्बन्धी">
+                        <option value="land_ownership">📜 जग्गाधनी प्रमाणपत्र</option>
+                        <option value="land_registration">🏞️ जग्गा दर्ता</option>
+                        <option value="house_registration">🏡 घर दर्ता</option>
+                        <option value="property_transfer">🔄 सम्पत्ति हस्तान्तरण</option>
+                    </optgroup>
+                    <optgroup label="बैंकिङ सेवा">
+                        <option value="bank_account">💳 बैंक खाता खोल्ने</option>
+                        <option value="loan_application">💰 ऋण निवेदन</option>
+                        <option value="remittance">💸 रेमिट्यान्स</option>
+                    </optgroup>
+                    <optgroup label="अन्य सेवाहरू">
+                        <option value="pension">👴 पेन्सन</option>
+                        <option value="social_security">🛡️ सामाजिक सुरक्षा</option>
+                        <option value="tax_clearance">💰 कर चुक्ता प्रमाणपत्र</option>
+                        <option value="health_services">🏥 स्वास्थ्य सेवा</option>
+                        <option value="education_services">📚 शैक्षिक सेवा</option>
+                    </optgroup>
+                    <option value="other">📋 अन्य सेवा</option>
+                `;
+                serviceSelect.disabled = false;
+            }
+            
+            // Reset service selection
+            trackingData.service = '';
+            checkStep2Complete();
+        }
         
         // District data by province
         const districtsByProvince = {
@@ -1290,6 +1470,7 @@
         
         document.getElementById('officeTypeSelect').addEventListener('change', function() {
             trackingData.officeType = this.value;
+            updateServiceOptions(this.value);
             checkStep2Complete();
         });
         
@@ -1383,6 +1564,67 @@
         
         // Initialize
         updateProgressDots();
+    </script>
+    
+    <!-- Database Integration -->
+    <script src="office-tracker-db.js"></script>
+    
+    <script>
+        // Initialize database and enhance form submission
+        document.addEventListener('DOMContentLoaded', function() {
+            // Track start time for analytics
+            window.trackerStartTime = Date.now();
+            
+            // Override the existing submitFeedback function
+            window.originalSubmitFeedback = window.submitFeedback;
+            
+            window.submitFeedback = async function() {
+                console.log('🏛️ Enhanced submitFeedback called with database integration');
+                
+                try {
+                    // Validate form data
+                    const validation = window.officeDB.validateSubmission(trackingData);
+                    if (!validation.isValid) {
+                        alert('कृपया सबै आवश्यक जानकारी भर्नुहोस्:\n' + validation.errors.join('\n'));
+                        return;
+                    }
+                    
+                    // Show loading state
+                    const submitButtons = document.querySelectorAll('button[onclick="submitFeedback()"]');
+                    submitButtons.forEach(btn => {
+                        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> सबमिट गर्दै...';
+                        btn.disabled = true;
+                    });
+                    
+                    // Submit to database
+                    console.log('📊 Submitting tracking data:', trackingData);
+                    const result = await window.officeDB.submitOfficeExperience(trackingData);
+                    
+                    if (result.success) {
+                        console.log('✅ Database submission successful:', result.id);
+                        
+                        // Show success message and hide form
+                        showSubmissionSuccess(result.id);
+                        document.querySelector('.container').style.display = 'none';
+                    } else {
+                        throw new Error(result.error || 'Database submission failed');
+                    }
+                    
+                } catch (error) {
+                    console.error('❌ Enhanced submission error:', error);
+                    alert('अस्थायी समस्या छ। कृपया फेरि प्रयास गर्नुहोस्।\n\nTechnical: ' + error.message);
+                    
+                    // Restore button state
+                    const submitButtons = document.querySelectorAll('button[onclick="submitFeedback()"]');
+                    submitButtons.forEach(btn => {
+                        btn.innerHTML = '<i class="fas fa-paper-plane"></i> पठाउनुहोस्';
+                        btn.disabled = false;
+                    });
+                }
+            };
+            
+            console.log('🏛️ Office Tracker Database Integration Ready');
+        });
     </script>
 </body>
 </html>
