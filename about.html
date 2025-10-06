@@ -15,7 +15,33 @@
             -moz-osx-font-smoothing: grayscale;
         }
         .nepali { font-family: 'Noto Sans Devanagari', sans-serif; }
+        .lang-ne { display: block; }
+        .lang-en { display: none; }
+        body.english .lang-ne { display: none; }
+        body.english .lang-en { display: block; }
     </style>
+    <script>
+        // Language toggle
+        function toggleLanguage() {
+            document.body.classList.toggle('english');
+            const btn = document.getElementById('langBtn');
+            if (document.body.classList.contains('english')) {
+                btn.textContent = 'नेपाली';
+                localStorage.setItem('language', 'en');
+            } else {
+                btn.textContent = 'English';
+                localStorage.setItem('language', 'ne');
+            }
+        }
+
+        // Load saved language preference
+        window.addEventListener('DOMContentLoaded', () => {
+            if (localStorage.getItem('language') === 'en') {
+                document.body.classList.add('english');
+                document.getElementById('langBtn').textContent = 'नेपाली';
+            }
+        });
+    </script>
 </head>
 <body class="bg-gray-50">
     <!-- Navigation -->
@@ -34,6 +60,9 @@
                 <div class="flex items-center space-x-6">
                     <a href="index.html#tools" class="text-gray-600 hover:text-gray-900 text-sm font-medium transition">Tools</a>
                     <a href="about.html" class="text-gray-900 text-sm font-semibold">About</a>
+                    <button id="langBtn" onclick="toggleLanguage()" class="text-gray-600 hover:text-gray-900 text-sm font-medium transition border border-gray-300 px-3 py-1 rounded">
+                        English
+                    </button>
                     <a href="index.html#tools" class="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-2 rounded-lg text-sm font-medium hover:shadow-lg transition">
                         Get Started
                     </a>
@@ -55,21 +84,29 @@
     <!-- Mission -->
     <section class="py-16 bg-white">
         <div class="container mx-auto px-6 max-w-4xl">
-            <h3 class="text-3xl font-bold text-gray-900 mb-6 nepali">किन बनायौं</h3>
+            <h3 class="text-3xl font-bold text-gray-900 mb-6">
+                <span class="lang-ne nepali">किन बनायौं</span>
+                <span class="lang-en">Why We Built This</span>
+            </h3>
             <div class="prose prose-lg max-w-none">
-                <p class="text-gray-700 leading-relaxed mb-4 nepali">
+                <p class="text-gray-700 leading-relaxed mb-4 lang-ne nepali">
                     समाचारहरू हेरफेर हुन्छन्। केही समाचार जबरजस्ती हामीलाई देखाइन्छ, केही लुकाइन्छ। आज कुनै नेता भ्रष्टाचारमा पक्राउ पर्छन्, छ महिना पछि आरोप सफा भएको खबर हावामा हराउँछ।
                 </p>
-                <p class="text-gray-700 leading-relaxed mb-4">
+                <p class="text-gray-700 leading-relaxed mb-4 lang-en">
                     News is often manipulated. Some stories are pushed to us, others are hidden. When a leader is arrested for corruption today, the story of cleared charges six months later disappears into thin air.
                 </p>
-                <p class="text-gray-700 leading-relaxed mb-4 nepali">
+
+                <p class="text-gray-700 leading-relaxed mb-4 lang-ne nepali">
                     <strong>हामी समाचारलाई कथाको रूपमा ट्र्याक गर्छौं।</strong> एउटा घटना, त्यसको पछि के भयो, अन्तमा के परिणाम आयो - सबै जोडेर देखाउँछौं। तपाईंले पाउनुपर्ने जानकारी, तपाईंको हकमा।
                 </p>
-                <p class="text-gray-700 leading-relaxed mb-4">
+                <p class="text-gray-700 leading-relaxed mb-4 lang-en">
                     <strong>We track news as stories.</strong> One event, what happened next, and the final outcome - all connected. The information you deserve, as you deserve it.
                 </p>
-                <p class="text-gray-700 leading-relaxed">
+
+                <p class="text-gray-700 leading-relaxed lang-ne nepali">
+                    समाचारभन्दा अलग, हामी तपाईंलाई कुन सरकारी कार्यालयले राम्रो काम गर्छ र कुनले गर्दैन भन्ने ट्र्याक गर्न मद्दत गर्छौं। हामी अन्तरक्रियात्मक सिकाइमार्फत राजनीतिक प्रणाली बुझ्न मद्दत गर्छौं। ज्ञान नै शक्ति हो।
+                </p>
+                <p class="text-gray-700 leading-relaxed lang-en">
                     Beyond news, we help you track which government offices work efficiently and which don't. We help you understand political systems through interactive learning. Knowledge is power.
                 </p>
             </div>
