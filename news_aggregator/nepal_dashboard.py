@@ -1722,7 +1722,9 @@ def main():
                         st.plotly_chart(timeline_fig, use_container_width=True)
                 else:
                     st.info("No timeline data available for selected period")
-            else:
+
+            # Fallback section if no trending stories (outside the main if block)
+            if not timeline_stories or len(timeline_stories) == 0:
                 # Instead of empty message, show recent activity overview
                 st.markdown("### 🔥 Trending Leaders & Topics (Last 24H)")
 
