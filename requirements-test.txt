@@ -1,0 +1,41 @@
+# Testing dependencies for Nepal Digital Intelligence Platform
+# Install with: pip install -r requirements-test.txt
+
+# Core testing framework
+pytest==8.0.0
+pytest-cov==4.0.0
+pytest-mock==3.12.0
+pytest-benchmark==4.0.0
+pytest-timeout==2.2.0
+pytest-xdist==3.5.0
+
+# Performance and profiling
+memory-profiler==0.61.0
+psutil==5.9.0
+
+# Test data generation
+factory-boy==3.3.0
+faker==20.1.0
+
+# HTTP mocking for external services
+responses==0.24.0
+requests-mock==1.11.0
+
+# Database testing utilities
+pytest-postgresql==5.0.0
+pytest-sqlite==0.2.0
+
+# Code quality and linting (optional for testing)
+flake8==7.0.0
+black==23.12.0
+isort==5.13.0
+
+# Coverage reporting
+coverage[toml]==7.4.0
+
+# Load testing (optional)
+locust==2.17.0
+
+# Additional utilities
+freezegun==1.4.0  # Time mocking for temporal tests
+parameterized==0.9.0  # Parameterized test utilities

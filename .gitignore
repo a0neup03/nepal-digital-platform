@@ -1,0 +1,27 @@
+# Virtual Environment
+nepal_env/
+venv/
+env/
+*.pyc
+__pycache__/
+
+# macOS
+.DS_Store
+
+# IDE
+.vscode/
+.idea/
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+*.tmp
+*.swp
+*~
+
+# Database backups
+*.backup.db
+*.db-wal
+*.db-shm

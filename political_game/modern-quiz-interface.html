@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="ne">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🇳🇵 नेपाल संविधान क्विज - आधुनिक इन्टरफेस</title>
+    <style>
+        /* Modern Claude-Style Design System */
+        :root {
+            /* Color Palette - Clean & Professional */
+            --bg-primary: #ffffff;
+            --bg-secondary: #f7f9fc;
+            --bg-tertiary: #eef2f6;
+            --bg-card: #ffffff;
+
+            /* Text Colors */
+            --text-primary: #1a1a2e;
+            --text-secondary: #525f7f;
+            --text-muted: #8898aa;
+
+            /* Accent Colors */
+            --accent-primary: #635bff;
+            --accent-primary-hover: #4f46e5;
+            --accent-success: #00d4aa;
+            --accent-warning: #ffa726;
+            --accent-error: #f56565;
+
+            /* Interactive States */
+            --border-default: #e3e8ef;
+            --border-hover: #c1c9d2;
+            --border-focus: var(--accent-primary);
+
+            /* Shadows - Subtle & Layered */
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+
+            /* Spacing */
+            --spacing-xs: 0.5rem;
+            --spacing-sm: 1rem;
+            --spacing-md: 1.5rem;
+            --spacing-lg: 2rem;
+            --spacing-xl: 3rem;
+
+            /* Border Radius */
+            --radius-sm: 0.375rem;
+            --radius-md: 0.5rem;
+            --radius-lg: 0.75rem;
+            --radius-xl: 1rem;
+        }
+
+        /* Dark Mode Support */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-primary: #0f1419;
+                --bg-secondary: #1a1f29;
+                --bg-tertiary: #252c3a;
+                --bg-card: #1a1f29;
+
+                --text-primary: #f7f9fc;
+                --text-secondary: #c1c9d2;
+                --text-muted: #8898aa;
+
+                --border-default: #2d3748;
+                --border-hover: #4a5568;
+            }
+        }
+
+        /* Reset & Base */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+                'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* Container */
+        .quiz-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: var(--spacing-xl) var(--spacing-md);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        .quiz-header {
+            text-align: center;
+            margin-bottom: var(--spacing-xl);
+            animation: fadeInDown 0.6s ease-out;
+        }
+
+        .quiz-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: var(--spacing-xs);
+            letter-spacing: -0.02em;
+        }
+
+        .quiz-subtitle {
+            font-size: 1.125rem;
+            color: var(--text-secondary);
+            font-weight: 400;
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            background: var(--bg-secondary);
+            border-radius: var(--radius-xl);
+            height: 8px;
+            margin-bottom: var(--spacing-xl);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-primary), var(--accent-success));
+            border-radius: var(--radius-xl);
+            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+
+        .progress-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .progress-text {
+            text-align: center;
+            margin-top: var(--spacing-xs);
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        /* Question Card */
+        .question-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-default);
+            border-radius: var(--radius-xl);
+            padding: var(--spacing-xl);
+            margin-bottom: var(--spacing-lg);
+            box-shadow: var(--shadow-lg);
+            animation: fadeInUp 0.6s ease-out;
+            transition: all 0.3s ease;
+        }
+
+        .question-card:hover {
+            box-shadow: var(--shadow-xl);
+            transform: translateY(-2px);
+        }
+
+        .question-number {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-primary-hover));
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: var(--radius-md);
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: var(--spacing-md);
+        }
+
+        .question-text {
+            font-size: 1.375rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            line-height: 1.5;
+            margin-bottom: var(--spacing-md);
+        }
+
+        .question-category {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+            background: var(--bg-secondary);
+            padding: 0.375rem 0.75rem;
+            border-radius: var(--radius-md);
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-top: var(--spacing-sm);
+        }
+
+        /* Choice Cards */
+        .choices-container {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .choice-card {
+            background: var(--bg-card);
+            border: 2px solid var(--border-default);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-md);
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .choice-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, var(--accent-primary), transparent);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .choice-card:hover {
+            border-color: var(--accent-primary);
+            transform: translateX(4px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .choice-card:hover::before {
+            opacity: 0.05;
+        }
+
+        .choice-card.selected {
+            border-color: var(--accent-primary);
+            background: linear-gradient(135deg, rgba(99, 91, 255, 0.1), transparent);
+        }
+
+        .choice-card.correct {
+            border-color: var(--accent-success);
+            background: linear-gradient(135deg, rgba(0, 212, 170, 0.1), transparent);
+        }
+
+        .choice-card.incorrect {
+            border-color: var(--accent-error);
+            background: linear-gradient(135deg, rgba(245, 101, 101, 0.1), transparent);
+        }
+
+        .choice-label {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+            position: relative;
+            z-index: 1;
+        }
+
+        .choice-letter {
+            width: 2rem;
+            height: 2rem;
+            background: var(--bg-tertiary);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.875rem;
+            flex-shrink: 0;
+            transition: all 0.2s ease;
+        }
+
+        .choice-card:hover .choice-letter,
+        .choice-card.selected .choice-letter {
+            background: var(--accent-primary);
+            color: white;
+        }
+
+        .choice-card.correct .choice-letter {
+            background: var(--accent-success);
+            color: white;
+        }
+
+        .choice-card.incorrect .choice-letter {
+            background: var(--accent-error);
+            color: white;
+        }
+
+        .choice-text {
+            font-size: 1rem;
+            color: var(--text-primary);
+            font-weight: 500;
+            flex: 1;
+        }
+
+        .choice-icon {
+            font-size: 1.25rem;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .choice-card.selected .choice-icon,
+        .choice-card.correct .choice-icon,
+        .choice-card.incorrect .choice-icon {
+            opacity: 1;
+        }
+
+        /* Action Buttons */
+        .action-container {
+            display: flex;
+            gap: var(--spacing-md);
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 0.875rem 2rem;
+            border: none;
+            border-radius: var(--radius-lg);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-primary-hover));
+            color: white;
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-default);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-tertiary);
+            border-color: var(--border-hover);
+        }
+
+        /* Explanation Card */
+        .explanation-card {
+            background: linear-gradient(135deg, rgba(99, 91, 255, 0.1), rgba(0, 212, 170, 0.1));
+            border: 1px solid var(--accent-primary);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-md);
+            margin-top: var(--spacing-lg);
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        .explanation-title {
+            font-weight: 600;
+            color: var(--accent-primary);
+            margin-bottom: var(--spacing-xs);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+        }
+
+        .explanation-text {
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .constitutional-ref {
+            background: var(--bg-card);
+            border-left: 3px solid var(--accent-primary);
+            padding: var(--spacing-sm);
+            margin-top: var(--spacing-sm);
+            border-radius: 0 var(--radius-md) var(--radius-md) 0;
+        }
+
+        /* Stats Card */
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: var(--spacing-md);
+            margin-top: var(--spacing-lg);
+        }
+
+        .stat-card {
+            background: var(--bg-secondary);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-md);
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-success));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            margin-top: var(--spacing-xs);
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 640px) {
+            .quiz-container {
+                padding: var(--spacing-md);
+            }
+
+            .quiz-title {
+                font-size: 1.5rem;
+            }
+
+            .question-text {
+                font-size: 1.125rem;
+            }
+
+            .action-container {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="quiz-container">
+        <!-- Header -->
+        <div class="quiz-header">
+            <h1 class="quiz-title">🇳🇵 नेपालको संविधान</h1>
+            <p class="quiz-subtitle">Constitutional Knowledge Quiz</p>
+        </div>
+
+        <!-- Progress -->
+        <div class="progress-container">
+            <div class="progress-bar" id="progressBar" style="width: 0%"></div>
+        </div>
+        <div class="progress-text" id="progressText">Question 0 of 10</div>
+
+        <!-- Question Card -->
+        <div class="question-card">
+            <span class="question-number" id="questionNumber">Question 1</span>
+            <h2 class="question-text" id="questionText">नेपालको संविधानमा कति मौलिक हक उल्लेख गरिएको छ?</h2>
+            <span class="question-category">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                </svg>
+                मौलिक हक (Fundamental Rights)
+            </span>
+        </div>
+
+        <!-- Choices -->
+        <div class="choices-container">
+            <div class="choice-card" onclick="selectChoice(this, 0)">
+                <div class="choice-label">
+                    <div class="choice-letter">A</div>
+                    <div class="choice-text">१२ मौलिक हक</div>
+                    <div class="choice-icon">✓</div>
+                </div>
+            </div>
+
+            <div class="choice-card" onclick="selectChoice(this, 1)">
+                <div class="choice-label">
+                    <div class="choice-letter">B</div>
+                    <div class="choice-text">१६ मौलिक हक</div>
+                    <div class="choice-icon">✓</div>
+                </div>
+            </div>
+
+            <div class="choice-card" onclick="selectChoice(this, 2)">
+                <div class="choice-label">
+                    <div class="choice-letter">C</div>
+                    <div class="choice-text">१८ मौलिक हक</div>
+                    <div class="choice-icon">✓</div>
+                </div>
+            </div>
+
+            <div class="choice-card" onclick="selectChoice(this, 3)">
+                <div class="choice-label">
+                    <div class="choice-letter">D</div>
+                    <div class="choice-text">२० मौलिक हक</div>
+                    <div class="choice-icon">✓</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="action-container">
+            <button class="btn btn-secondary" onclick="skipQuestion()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 5l7 7-7 7"/>
+                </svg>
+                Skip
+            </button>
+            <button class="btn btn-primary" id="submitBtn" onclick="submitAnswer()" disabled>
+                Check Answer
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M5 13l4 4L19 7"/>
+                </svg>
+            </button>
+        </div>
+
+        <!-- Explanation (hidden until answered) -->
+        <div class="explanation-card" id="explanation" style="display: none;">
+            <div class="explanation-title">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <path d="M12 16v-4M12 8h.01"/>
+                </svg>
+                व्याख्या (Explanation)
+            </div>
+            <p class="explanation-text">
+                नेपालको संविधान २०७२ ले <strong>१६ मौलिक हकहरू</strong> प्रदान गरेको छ। यसमा अधिकारको हक, स्वतन्त्रताको हक, समानताको हक आदि समावेश छन्।
+            </p>
+            <div class="constitutional-ref">
+                📜 <strong>संवैधानिक सन्दर्भ:</strong> धारा १६-३१
+            </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-container">
+            <div class="stat-card">
+                <div class="stat-value" id="scoreValue">0</div>
+                <div class="stat-label">Score</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="accuracyValue">0%</div>
+                <div class="stat-label">Accuracy</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="streakValue">0</div>
+                <div class="stat-label">Streak</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Quiz State Management
+        let currentQuestion = 0;
+        let selectedChoice = null;
+        let score = 0;
+        let accuracy = 0;
+        let streak = 0;
+        let answeredQuestions = 0;
+
+        const correctAnswer = 1; // Index of correct answer (B - 16 fundamental rights)
+
+        // Question Bank
+        const questions = [
+            {
+                question: "नेपालको संविधानमा कति मौलिक हक उल्लेख गरिएको छ?",
+                choices: ["१२ मौलिक हक", "१६ मौलिक हक", "१८ मौलिक हक", "२० मौलिक हक"],
+                correct: 1,
+                category: "मौलिक हक (Fundamental Rights)",
+                explanation: "नेपालको संविधान २०७२ ले १६ मौलिक हकहरू प्रदान गरेको छ।",
+                reference: "धारा १६-३१"
+            },
+            {
+                question: "नेपालको वर्तमान संविधान कहिले जारी भएको हो?",
+                choices: ["असोज ३, २०७२", "माघ ७, २०६३", "चैत १५, २०७२", "भदौ २०, २०७२"],
+                correct: 3,
+                category: "सामान्य ज्ञान (General Knowledge)",
+                explanation: "नेपालको वर्तमान संविधान भदौ २०, २०७२ मा जारी भएको थियो।",
+                reference: "संविधान २०७२"
+            }
+        ];
+
+        function selectChoice(element, index) {
+            // Remove previous selection
+            document.querySelectorAll('.choice-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+
+            // Add selection to clicked card
+            element.classList.add('selected');
+            selectedChoice = index;
+
+            // Enable submit button
+            document.getElementById('submitBtn').disabled = false;
+        }
+
+        function submitAnswer() {
+            if (selectedChoice === null) return;
+
+            const choices = document.querySelectorAll('.choice-card');
+            const currentQ = questions[currentQuestion];
+
+            // Mark correct/incorrect
+            choices.forEach((card, index) => {
+                if (index === currentQ.correct) {
+                    card.classList.add('correct');
+                } else if (index === selectedChoice && index !== currentQ.correct) {
+                    card.classList.add('incorrect');
+                }
+                card.onclick = null; // Disable further clicking
+            });
+
+            // Update stats
+            answeredQuestions++;
+            if (selectedChoice === currentQ.correct) {
+                score += 10;
+                streak++;
+            } else {
+                streak = 0;
+            }
+            accuracy = Math.round((score / (answeredQuestions * 10)) * 100);
+
+            updateStats();
+
+            // Show explanation
+            const explanationCard = document.getElementById('explanation');
+            const explanationText = explanationCard.querySelector('.explanation-text');
+            const refText = explanationCard.querySelector('.constitutional-ref');
+
+            explanationText.innerHTML = currentQ.explanation;
+            refText.innerHTML = `📜 <strong>संवैधानिक सन्दर्भ:</strong> ${currentQ.reference}`;
+            explanationCard.style.display = 'block';
+
+            // Change button to "Next"
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.textContent = 'Next Question';
+            submitBtn.innerHTML = 'Next Question <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5l7 7-7 7"/></svg>';
+            submitBtn.onclick = nextQuestion;
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+
+            if (currentQuestion >= questions.length) {
+                currentQuestion = 0; // Loop back for demo
+            }
+
+            selectedChoice = null;
+
+            // Reset UI
+            const choices = document.querySelectorAll('.choice-card');
+            choices.forEach((card, index) => {
+                card.classList.remove('selected', 'correct', 'incorrect');
+                card.onclick = () => selectChoice(card, index);
+            });
+
+            document.getElementById('explanation').style.display = 'none';
+
+            // Update question
+            const q = questions[currentQuestion];
+            document.getElementById('questionNumber').textContent = `Question ${currentQuestion + 1}`;
+            document.getElementById('questionText').textContent = q.question;
+            document.querySelector('.question-category').innerHTML = `
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                </svg>
+                ${q.category}
+            `;
+
+            // Update choices
+            choices.forEach((card, index) => {
+                card.querySelector('.choice-text').textContent = q.choices[index];
+            });
+
+            // Update progress
+            updateProgress();
+
+            // Reset button
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.textContent = 'Check Answer';
+            submitBtn.innerHTML = 'Check Answer <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 13l4 4L19 7"/></svg>';
+            submitBtn.onclick = submitAnswer;
+            submitBtn.disabled = true;
+        }
+
+        function skipQuestion() {
+            nextQuestion();
+        }
+
+        function updateProgress() {
+            const progress = ((currentQuestion + 1) / questions.length) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+            document.getElementById('progressText').textContent = `Question ${currentQuestion + 1} of ${questions.length}`;
+        }
+
+        function updateStats() {
+            document.getElementById('scoreValue').textContent = score;
+            document.getElementById('accuracyValue').textContent = accuracy + '%';
+            document.getElementById('streakValue').textContent = streak;
+        }
+
+        // Initialize
+        updateProgress();
+    </script>
+</body>
+</html>

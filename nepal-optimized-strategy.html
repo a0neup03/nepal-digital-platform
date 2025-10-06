@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="ne">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🇳🇵 नेपाल राजनीतिक रणनीति खेल - उन्नत</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* Professional Game Styling */
+        :root {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-tertiary: #334155;
+            --accent-primary: #3b82f6;
+            --accent-success: #10b981;
+            --accent-warning: #f59e0b;
+            --accent-danger: #ef4444;
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --shadow-glow: 0 0 20px rgba(59, 130, 246, 0.3);
+            --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-success: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            --gradient-danger: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            --card-bg: #1e293b;
+            --border-color: #334155;
+            --choice-bg: #334155;
+            --choice-hover: #475569;
+        }
+        
+        /* Light mode variables */
+        [data-theme="light"] {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8fafc;
+            --bg-tertiary: #e2e8f0;
+            --text-primary: #1e293b;
+            --text-secondary: #475569;
+            --accent-primary: #3b82f6;
+            --accent-success: #10b981;
+            --accent-warning: #f59e0b;
+            --accent-danger: #ef4444;
+            --card-bg: #ffffff;
+            --border-color: #e2e8f0;
+            --choice-bg: #f1f5f9;
+            --choice-hover: #e2e8f0;
+        }
+        
+        /* Base styling */
+        * { box-sizing: border-box; }
+        body {
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            transition: all 0.3s ease;
+        }
+        
+        /* Performance optimized animations */
+        .metric-bar { 
+            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            will-change: width;
+            transform: translateZ(0);
+            background: var(--gradient-primary);
+        }
+        
+        .faction-circle { 
+            width: 48px; height: 48px; border-radius: 50%; position: relative; 
+            display: flex; align-items: center; justify-content: center; font-size: 16px; 
+            border: 3px solid; transition: all 0.3s ease; will-change: transform;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+        .faction-circle.high { border-color: var(--accent-success); background: var(--gradient-success); }
+        .faction-circle.medium { border-color: var(--accent-warning); background: linear-gradient(135deg, #f59e0b, #d97706); }
+        .faction-circle.low { border-color: var(--accent-danger); background: var(--gradient-danger); }
+        
+        .event-card { 
+            border-radius: 12px; 
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+            background: var(--bg-secondary);
+            border: 1px solid var(--bg-tertiary);
+            will-change: transform;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .event-card:hover { 
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: var(--shadow-glow);
+        }
+        
+        .character-trait { 
+            background: var(--gradient-primary);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        /* UI Controls */
+        .control-panel {
+            position: fixed; top: 150px; right: 20px; z-index: 1000;
+            display: flex; flex-direction: column; gap: 8px; align-items: center;
+        }
+        
+        .control-btn {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            border: 1px solid var(--bg-tertiary);
+            padding: 8px 12px; border-radius: 8px;
+            cursor: pointer; font-size: 12px;
+            transition: all 0.2s ease;
+            backdrop-filter: blur(10px);
+            min-width: 44px;
+        }
+        
+        .control-btn.compact {
+            padding: 6px 8px;
+            font-size: 11px;
+            min-width: 38px;
+        }
+        .control-btn:hover {
+            background: var(--accent-primary);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-glow);
+        }
+        
+        .pause-btn {
+            background: var(--accent-warning);
+            color: white; font-weight: bold;
+            animation: pulse 2s infinite;
+        }
+        .pause-btn.paused {
+            background: var(--accent-success);
+            animation: none;
+        }
+        
+        /* Game timer */
+        .timer-display {
+            position: fixed; top: 20px; left: 50%;
+            transform: translateX(-50%);
+            background: var(--bg-secondary);
+            border: 2px solid var(--accent-primary);
+            padding: 8px 16px; border-radius: 20px;
+            font-family: 'Courier New', monospace;
+            font-weight: bold; font-size: 18px;
+            box-shadow: var(--shadow-glow);
+            z-index: 1000;
+        }
+        .timer-warning { border-color: var(--accent-warning); }
+        .timer-critical { border-color: var(--accent-danger); animation: pulse 1s infinite; }
+        
+        /* Analytics panel */
+        .analytics-panel {
+            position: fixed; right: -450px; top: 0; bottom: 0; width: 450px;
+            background: var(--bg-secondary);
+            border-left: 1px solid var(--bg-tertiary);
+            transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 500; overflow-y: auto;
+            backdrop-filter: blur(20px);
+        }
+        .analytics-panel.open { right: 0; }
+        
+        .analytics-toggle {
+            position: fixed; right: 20px; bottom: 20px; z-index: 1000;
+            background: var(--gradient-primary);
+            color: white; padding: 16px; border-radius: 50%;
+            cursor: pointer; width: 64px; height: 64px;
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.3s ease; font-size: 20px;
+            box-shadow: var(--shadow-glow);
+        }
+        .analytics-toggle:hover {
+            transform: scale(1.1) rotate(5deg);
+            box-shadow: 0 0 30px rgba(59, 130, 246, 0.5);
+        }
+        
+        /* Game rules panel */
+        .rules-panel {
+            position: fixed; left: -400px; top: 0; bottom: 0; width: 400px;
+            background: var(--bg-secondary);
+            border-right: 1px solid var(--bg-tertiary);
+            transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 500; overflow-y: auto;
+            backdrop-filter: blur(20px);
+        }
+        .rules-panel.open { left: 0; }
+        
+        .rules-toggle {
+            position: fixed; left: 20px; bottom: 20px; z-index: 1000;
+            background: var(--accent-success);
+            color: white; padding: 16px; border-radius: 50%;
+            cursor: pointer; width: 64px; height: 64px;
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.3s ease; font-size: 20px;
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+        }
+        .rules-toggle:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 30px rgba(16, 185, 129, 0.5);
+        }
+        
+        /* Professional animations */
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
+        @keyframes glow {
+            0%, 100% { box-shadow: var(--shadow-glow); }
+            50% { box-shadow: 0 0 30px rgba(59, 130, 246, 0.6); }
+        }
+        
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .fade-in-up { animation: fadeInUp 0.5s ease-out; }
+        .glow-effect { animation: glow 2s infinite; }
+        
+        /* Professional scrollbars */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-tertiary); }
+        ::-webkit-scrollbar-thumb { 
+            background: var(--accent-primary);
+            border-radius: 4px;
+            transition: background 0.3s ease;
+        }
+        ::-webkit-scrollbar-thumb:hover { background: var(--accent-success); }
+        
+        /* Loading improvements */
+        .loading-progress {
+            position: relative;
+            overflow: hidden;
+            border-radius: 4px;
+            background: var(--bg-tertiary);
+        }
+        .loading-progress::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: var(--gradient-primary);
+            animation: shimmer 2s infinite;
+        }
+        
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+        
+        /* Event and choice card improvements */
+        .event-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .choice-card {
+            background: var(--choice-bg) !important;
+            border: 1px solid var(--border-color) !important;
+            color: var(--text-primary) !important;
+            transition: all 0.2s ease;
+        }
+        
+        .choice-card:hover {
+            background: var(--choice-hover) !important;
+            border-color: var(--accent-primary) !important;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+        }
+
+        /* Professional notification animations */
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        /* Question transition animations */
+        .event-transition {
+            animation: eventSlideIn 0.5s ease-out;
+        }
+
+        @keyframes eventSlideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* Professional news-style question numbering */
+        .question-header {
+            background: linear-gradient(90deg, #003893, #DC143C);
+        }
+        
+        /* Modern Design Enhancements */
+        .text-gradient {
+            background: linear-gradient(135deg, #003893 0%, #DC143C 50%, #FFD700 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .border-gradient {
+            border-image: linear-gradient(45deg, #003893, #DC143C, #FFD700) 1;
+        }
+        
+        /* Enhanced Character Portrait */
+        #eventImage {
+            transition: all 0.3s ease;
+            filter: brightness(1.1) contrast(1.1);
+        }
+        
+        #eventImage:hover {
+            transform: scale(1.05);
+            box-shadow: 0 15px 35px rgba(0, 56, 147, 0.3);
+        }
+        
+        /* Modern Choice Cards */
+        .modern-choice-card {
+            background: linear-gradient(135deg, var(--choice-bg) 0%, rgba(51, 65, 85, 0.8) 100%);
+            border: 2px solid transparent;
+            border-radius: 16px;
+            padding: 20px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .modern-choice-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: left 0.5s ease;
+        }
+        
+        .modern-choice-card:hover {
+            border-color: #003893;
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(0, 56, 147, 0.25);
+        }
+        
+        .modern-choice-card:hover::before {
+            left: 100%;
+        }
+        
+        .choice-icon {
+            font-size: 2rem;
+            margin-bottom: 12px;
+            display: block;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+        }
+        
+        .choice-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
+        
+        .choice-description {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+        
+        /* Probability indicators */
+        .probability-high { background: linear-gradient(135deg, #10b981, #059669); }
+        .probability-medium { background: linear-gradient(135deg, #f59e0b, #d97706); }
+        .probability-low { background: linear-gradient(135deg, #ef4444, #dc2626); }
+        
+        /* Category badges */
+        .category-political { background: linear-gradient(135deg, #003893, #1e40af); }
+        .category-economic { background: linear-gradient(135deg, #059669, #047857); }
+        .category-social { background: linear-gradient(135deg, #7c3aed, #6d28d9); }
+        .category-corruption { background: linear-gradient(135deg, #dc2626, #b91c1c); }
+        
+        /* ENTERPRISE GRADE TEXT READABILITY - MAXIMUM CONTRAST */
+        .choice-title {
+            color: #ffffff !important; /* Pure white for maximum contrast */
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8) !important; /* Strong shadow for visibility */
+            font-weight: 700 !important;
+            font-size: 1.1rem !important;
+        }
+        
+        .choice-description {
+            color: #f1f5f9 !important; /* Near-white for readability */
+            text-shadow: 0 1px 3px rgba(0,0,0,0.7) !important;
+            line-height: 1.6;
+            font-size: 0.95rem !important;
+        }
+        
+        /* CRITICAL: Remove gradient text that's unreadable */
+        .text-gradient, #eventTitle.text-gradient {
+            background: none !important;
+            -webkit-background-clip: unset !important;
+            -webkit-text-fill-color: unset !important;
+            background-clip: unset !important;
+            color: #ffffff !important; /* Pure white instead of gradient */
+            text-shadow: 0 3px 6px rgba(0,0,0,0.9) !important;
+            font-weight: 800 !important;
+        }
+        
+        /* Constitutional validity and critical text */
+        .constitutional-badge, .event-context, #contextText, #eventDescription {
+            color: #ffffff !important;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8) !important;
+            font-weight: 500 !important;
+        }
+        
+        /* Premium question title readability */
+        #eventTitle {
+            color: #ffffff !important;
+            text-shadow: 0 3px 6px rgba(0,0,0,0.9) !important;
+            font-weight: 800 !important;
+            font-size: 2rem !important;
+        }
+        
+        /* Enhanced contrast for all text elements */
+        .text-primary, [style*="var(--text-primary)"] {
+            color: #ffffff !important;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.7) !important;
+        }
+        
+        .text-secondary, [style*="var(--text-secondary)"] {
+            color: #f1f5f9 !important;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.6) !important;
+        }
+        
+        /* Enhanced choice card backgrounds for better contrast */
+        .modern-choice-card {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.95) 0%, rgba(51, 65, 85, 0.95) 100%) !important;
+            border: 2px solid rgba(255, 255, 255, 0.1) !important;
+            backdrop-filter: blur(10px) !important;
+        }
+        
+        .modern-choice-card:hover {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 1) 0%, rgba(51, 65, 85, 1) 100%) !important;
+            border-color: #3b82f6 !important;
+        }
+        
+        /* Question container enhancement */
+        #currentEvent {
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 41, 59, 0.95) 100%) !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            backdrop-filter: blur(15px) !important;
+        }
+            padding: 8px 16px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .question-number {
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            color: white;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+
+        .question-title {
+            color: white;
+            font-weight: bold;
+            flex-grow: 1;
+            margin-left: 12px;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white min-h-screen" data-lang="ne">
+    <!-- Control Panel -->
+    <div class="control-panel">
+        <button id="themeToggle" class="control-btn compact" title="Toggle Dark/Light Mode">🌓</button>
+        <button id="langToggle" class="control-btn compact">EN</button>
+        <button id="pauseToggle" class="control-btn compact pause-btn" title="Pause/Resume Game">⏸️</button>
+    </div>
+    
+    <!-- Game Timer - TEMPORARILY DISABLED -->
+    <!-- <div id="gameTimer" class="timer-display">
+        <span id="nextEventTimer">00:00</span>
+        <span class="text-sm ml-2" data-i18n="next_event">अर्को घटना</span>
+    </div> -->
+    
+    <!-- Analytics Toggle -->
+    <button id="analyticsToggle" class="analytics-toggle" title="Decision Analysis">📊</button>
+    
+    <!-- Rules Toggle -->
+    <button id="rulesToggle" class="rules-toggle" title="Game Rules">📋</button>
+    
+    <!-- Rules Panel -->
+    <div id="rulesPanel" class="rules-panel">
+        <div class="p-6">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-xl font-bold" data-i18n="game_rules">खेलका नियमहरू</h2>
+                <button id="closeRules" class="text-gray-400 hover:text-white">✕</button>
+            </div>
+            
+            <!-- Timer Rules -->
+            <div class="mb-6 bg-yellow-900/20 border border-yellow-600/30 p-4 rounded-lg">
+                <h3 class="text-lg font-semibold mb-2 text-yellow-400">⏰ टाइमर नियम</h3>
+                <ul class="text-sm space-y-2 text-gray-300">
+                    <li>• प्रत्येक घटना ५-१५ सेकेन्डमा आउँछ</li>
+                    <li>• निष्क्रिय भएमा खेल पज नहुँदैन</li>
+                    <li>• ⏸️ बटन दबाएर पज गर्न सकिन्छ</li>
+                    <li>• टाइमर माथि देखिन्छ</li>
+                </ul>
+            </div>
+            
+            <!-- Scoring -->
+            <div class="mb-6">
+                <h3 class="text-lg font-semibold mb-2">📊 स्कोरिङ्ग प्रणाली</h3>
+                <div class="space-y-2 text-sm text-gray-300">
+                    <div class="flex justify-between"><span>स्थिरता:</span><span class="text-blue-400">सरकारी स्थिरता</span></div>
+                    <div class="flex justify-between"><span>अर्थतन्त्र:</span><span class="text-green-400">आर्थिक स्वास्थ्य</span></div>
+                    <div class="flex justify-between"><span>मनोबल:</span><span class="text-purple-400">जनता खुसी</span></div>
+                    <div class="flex justify-between"><span>तनाव:</span><span class="text-red-400">संकट स्तर</span></div>
+                </div>
+            </div>
+            
+            <!-- Win/Lose Conditions -->
+            <div class="mb-6">
+                <h3 class="text-lg font-semibold mb-2">🏆 जित/हार सर्तहरू</h3>
+                <div class="grid grid-cols-2 gap-4 text-sm">
+                    <div class="bg-red-900/20 border border-red-600/30 p-3 rounded">
+                        <h4 class="text-red-400 font-semibold">हार</h4>
+                        <ul class="mt-1 space-y-1 text-gray-300">
+                            <li>• स्थिरता ० पुग्यो</li>
+                            <li>• मनोबल ० पुग्यो</li>
+                            <li>• तनाव १०० पुग्यो</li>
+                        </ul>
+                    </div>
+                    <div class="bg-green-900/20 border border-green-600/30 p-3 rounded">
+                        <h4 class="text-green-400 font-semibold">जित</h4>
+                        <ul class="mt-1 space-y-1 text-gray-300">
+                            <li>• १०० दिन बाँच्यो</li>
+                            <li>• उच्च स्कोर कायम राख्यो</li>
+                            <li>• सफल निर्णयहरू गर्यो</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Controls -->
+            <div>
+                <h3 class="text-lg font-semibold mb-2">🎮 नियन्त्रणहरू</h3>
+                <div class="space-y-2 text-sm text-gray-300">
+                    <div class="flex justify-between"><span>⏸️/▶️:</span><span>पज/सुरु गर्नुहोस्</span></div>
+                    <div class="flex justify-between"><span>🌓:</span><span>डार्क/लाइट मोड</span></div>
+                    <div class="flex justify-between"><span>नेपाली/English:</span><span>भाषा बदल्नुहोस्</span></div>
+                    <div class="flex justify-between"><span>📊:</span><span>विश्लेषण हेर्नुहोस्</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Analytics Panel -->
+    <div id="analyticsPanel" class="analytics-panel">
+        <div class="p-6">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-xl font-bold" data-i18n="analytics_title">निर्णय विश्लेषण</h2>
+                <button id="closeAnalytics" class="text-gray-400 hover:text-white">✕</button>
+            </div>
+            
+            <!-- Score Chart -->
+            <div class="mb-6">
+                <h3 class="text-lg font-semibold mb-3" data-i18n="score_trends">स्कोर ट्रेन्ड</h3>
+                <div class="relative">
+                    <canvas id="scoreChart" width="400" height="250"></canvas>
+                </div>
+            </div>
+            
+            <!-- Decision History -->
+            <div class="mb-6">
+                <h3 class="text-lg font-semibold mb-3" data-i18n="decision_history">निर्णय इतिहास</h3>
+                <div id="analyticsDecisionHistory" class="space-y-3 max-h-64 overflow-y-auto">
+                    <div class="text-sm text-gray-400">निर्णयहरू यहाँ देखिनेछन्...</div>
+                </div>
+            </div>
+            
+            <!-- Performance Stats -->
+            <div>
+                <h3 class="text-lg font-semibold mb-3" data-i18n="performance_stats">प्रदर्शन तथ्याङ्क</h3>
+                <div id="performanceStats" class="grid grid-cols-2 gap-3">
+                    <div class="bg-blue-900/20 border border-blue-600/30 p-3 rounded text-center">
+                        <div class="text-2xl font-bold text-blue-400" id="totalDecisions">0</div>
+                        <div class="text-xs text-gray-400">कुल निर्णयहरू</div>
+                    </div>
+                    <div class="bg-green-900/20 border border-green-600/30 p-3 rounded text-center">
+                        <div class="text-2xl font-bold text-green-400" id="successRate">0%</div>
+                        <div class="text-xs text-gray-400">सफलता दर</div>
+                    </div>
+                    <div class="bg-purple-900/20 border border-purple-600/30 p-3 rounded text-center">
+                        <div class="text-2xl font-bold text-purple-400" id="avgScore">0</div>
+                        <div class="text-xs text-gray-400">औसत स्कोर</div>
+                    </div>
+                    <div class="bg-yellow-900/20 border border-yellow-600/30 p-3 rounded text-center">
+                        <div class="text-2xl font-bold text-yellow-400" id="timeInOffice">0m</div>
+                        <div class="text-xs text-gray-400">कार्यालयमा समय</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Screen -->
+    <div id="loadingScreen" class="fixed inset-0 bg-gray-900 flex items-center justify-center z-50">
+        <div class="text-center">
+            <div class="text-6xl mb-4">🇳🇵</div>
+            <div class="text-2xl font-bold mb-4" data-i18n="loading_title">उन्नत राजनीतिक रणनीति इन्जिन</div>
+            <div class="w-64 bg-gray-700 rounded-full h-2 mb-4">
+                <div id="loadingBar" class="bg-blue-500 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+            </div>
+            <div id="loadingText" class="text-gray-400" data-i18n="initializing">सम्भाव्यता म्याट्रिक्स प्रारम्भ गर्दै...</div>
+        </div>
+    </div>
+
+    <!-- Character Selection -->
+    <div id="characterSelection" class="hidden container mx-auto px-4 py-8 smooth-scroll">
+        <div class="bg-gray-800 rounded-lg shadow-2xl p-8 max-w-6xl mx-auto">
+            <div class="text-center mb-8">
+                <h1 class="text-4xl font-bold mb-4" data-i18n="choose_character">🇳🇵 के होला त देशमा अब?</h1>
+                <p class="text-gray-400 text-lg mb-6" data-i18n="character_subtitle">कुन नेता बनेर नेपालको भविष्य लेख्ने? हरेक चरित्रको फरक कथा र चुनौती छ।</p>
+                <div class="text-sm text-green-400 mb-4" data-i18n="advanced_features">
+                    ✨ उन्नत सुविधाहरू: प्रति पात्र ५०+ घटनाहरू • रियल-टाइम गेमप्ले • सम्भाव्यता-आधारित परिणामहरू
+                </div>
+            </div>
+            <div id="characterGrid" class="grid md:grid-cols-3 lg:grid-cols-4 gap-6">
+                <!-- Character cards populated by JS -->
+            </div>
+            <div class="text-center mt-8">
+                <button id="startAdvancedGame" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-8 rounded-lg text-lg disabled:bg-gray-600 disabled:cursor-not-allowed" disabled data-i18n="start_journey">
+                    🚀 राजनीतिक यात्रा सुरु गर्नुहोस्
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Game Interface -->
+    <div id="gameInterface" class="hidden">
+        <!-- Optimized Header Dashboard -->
+        <div class="bg-gray-800 border-b border-gray-700 px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <a href="index.html" class="text-blue-400 hover:text-blue-300 transition-colors mr-2" title="मुख्य पृष्ठमा फर्कनुहोस्">
+                        <i class="fas fa-arrow-left text-xl"></i>
+                    </a>
+                    <div class="text-3xl">🇳🇵</div>
+                    <div>
+                        <h1 class="text-2xl font-bold" data-i18n="game_title">नेपाल राजनीतिक रणनीति</h1>
+                        <div class="flex items-center space-x-4 text-sm text-gray-400">
+                            <span id="characterName">अज्ञात नेता</span>
+                            <span>•</span>
+                            <span data-i18n="day">दिन</span> <span id="dayCounter">1</span>
+                            <span>•</span>
+                            <span class="text-green-400">● प्रत्यक्ष</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-6">
+                    <div class="text-center">
+                        <div class="text-2xl font-bold text-yellow-400" id="politicalCapital">100</div>
+                        <div class="text-xs text-gray-400" data-i18n="political_capital">राजनीतिक पूँजी</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-lg font-bold text-green-400" id="decisionsMade">0</div>
+                        <div class="text-xs text-gray-400" data-i18n="decisions">निर्णयहरू</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Optimized Metrics Dashboard - STICKY -->
+        <div class="sticky top-0 z-50 bg-gray-800 px-6 py-3 border-b border-gray-700 shadow-lg">
+            <div class="grid grid-cols-4 gap-6">
+                <div class="flex items-center space-x-3">
+                    <span class="text-blue-400 text-xl">🏛️</span>
+                    <div class="flex-1">
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="text-sm font-semibold" data-i18n="stability">स्थिरता</span>
+                            <span id="stabilityValue" class="text-sm font-bold">75</span>
+                        </div>
+                        <div class="w-full bg-gray-700 rounded-full h-2">
+                            <div id="stabilityBar" class="metric-bar bg-blue-500 h-2 rounded-full" style="width: 75%"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <span class="text-green-400 text-xl">💰</span>
+                    <div class="flex-1">
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="text-sm font-semibold" data-i18n="economy">अर्थतन्त्र</span>
+                            <span id="economyValue" class="text-sm font-bold">60</span>
+                        </div>
+                        <div class="w-full bg-gray-700 rounded-full h-2">
+                            <div id="economyBar" class="metric-bar bg-green-500 h-2 rounded-full" style="width: 60%"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <span class="text-purple-400 text-xl">😊</span>
+                    <div class="flex-1">
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="text-sm font-semibold" data-i18n="morale">मनोबल</span>
+                            <span id="moraleValue" class="text-sm font-bold">70</span>
+                        </div>
+                        <div class="w-full bg-gray-700 rounded-full h-2">
+                            <div id="moraleBar" class="metric-bar bg-purple-500 h-2 rounded-full" style="width: 70%"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <span class="text-red-400 text-xl">⚠️</span>
+                    <div class="flex-1">
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="text-sm font-semibold" data-i18n="stress">तनाव</span>
+                            <span id="stressValue" class="text-sm font-bold">15</span>
+                        </div>
+                        <div class="w-full bg-gray-700 rounded-full h-2">
+                            <div id="stressBar" class="metric-bar bg-red-500 h-2 rounded-full" style="width: 15%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Faction Relations -->
+        <div class="bg-gray-800 px-6 py-3 border-b border-gray-700">
+            <div class="flex items-center justify-between">
+                <span class="text-sm font-semibold text-gray-300" data-i18n="coalition_relations">गठबन्धन सम्बन्धहरू:</span>
+                <div id="factionRelations" class="flex items-center space-x-4">
+                    <!-- Faction circles populated by JS -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content Area -->
+        <div class="flex-1 flex">
+            <!-- Event Panel -->
+            <div class="flex-1 p-6">
+                <div id="currentEvent" class="event-card p-8 mb-6 gpu-accelerated" style="color: var(--text-primary);">
+                    <!-- Modern Question Header with Character Portrait -->
+                    <div class="flex items-start space-x-6 mb-6">
+                        <div class="relative">
+                            <img id="eventImage" class="w-40 h-40 object-cover rounded-xl shadow-xl border-4 border-gradient" src="" alt="घटना">
+                            <div class="absolute -top-2 -right-2 bg-gradient-to-r from-blue-600 to-red-600 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">
+                                <span id="eventTimer">00:00</span>
+                            </div>
+                        </div>
+                        <div class="flex-1">
+                            <!-- Question Number & Category -->
+                            <div class="flex items-center gap-3 mb-3">
+                                <div class="bg-gradient-to-r from-blue-600 to-red-600 text-white text-sm font-bold px-4 py-2 rounded-lg">
+                                    प्रश्न <span id="questionNumber">1</span>
+                                </div>
+                                <span id="eventCategory" class="bg-gray-700 text-gray-300 text-xs px-3 py-1 rounded-full">राजनीतिक</span>
+                                <span id="eventProbability" class="bg-yellow-500 text-black text-xs font-semibold px-3 py-1 rounded-full">गणना गर्दै...</span>
+                            </div>
+                            
+                            <!-- Clean, Shorter Title -->
+                            <h2 id="eventTitle" class="text-3xl font-bold mb-4 leading-tight text-gradient">अर्को घटना लोड हुँदैछ...</h2>
+                            
+                            <!-- Simplified Description -->
+                            <div id="eventDescription" class="text-lg leading-relaxed mb-4" style="color: var(--text-secondary);"></div>
+                            
+                            <!-- Context Card with Icon -->
+                            <div id="eventContext" class="bg-gradient-to-r from-blue-900/20 to-red-900/20 border border-blue-500/30 rounded-lg p-4 mb-4">
+                                <div class="flex items-start gap-3">
+                                    <div class="text-2xl">🎯</div>
+                                    <p id="contextText" class="text-sm font-medium"></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Modern Choice Cards Grid -->
+                    <div id="choicesContainer" class="grid gap-4 mt-6">
+                        <!-- Choice cards populated by JS with new design -->
+                    </div>
+                </div>
+
+                <!-- Active Effects Panel -->
+                <div id="activeEffects" class="bg-gray-700 rounded-lg p-4">
+                    <h3 class="text-sm font-semibold mb-3 text-gray-300" data-i18n="active_effects">सक्रिय प्रभावहरू र नतिजाहरू</h3>
+                    <div id="effectsList" class="space-y-2">
+                        <div class="text-sm text-gray-400" data-i18n="no_effects">कुनै सक्रिय प्रभावहरू छैनन्</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Side Panel -->
+            <div class="w-80 bg-gray-800 border-l border-gray-700 p-6">
+                <!-- Character Info -->
+                <div class="mb-6">
+                    <h3 class="text-lg font-bold mb-3" data-i18n="character_profile">चरित्र प्रोफाइल</h3>
+                    <div id="characterProfile" class="space-y-3">
+                        <!-- Character details populated by JS -->
+                    </div>
+                </div>
+
+                <!-- Recent Decisions -->
+                <div class="mb-6">
+                    <h3 class="text-lg font-bold mb-3" data-i18n="recent_decisions">हालका निर्णयहरू</h3>
+                    <div id="decisionHistory" class="space-y-2 max-h-48 overflow-y-auto smooth-scroll">
+                        <div class="text-sm text-gray-400" data-i18n="no_decisions">अहिलेसम्म कुनै निर्णय छैन</div>
+                    </div>
+                </div>
+
+                <!-- Event Probability -->
+                <div>
+                    <h3 class="text-lg font-bold mb-3" data-i18n="event_probability">घटना सम्भावना</h3>
+                    <div id="eventProbabilities" class="space-y-2">
+                        <!-- Probability indicators populated by JS -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game Over Screen -->
+    <div id="gameOverScreen" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50">
+        <div class="bg-white text-gray-800 rounded-lg shadow-2xl p-8 max-w-2xl w-full text-center fade-in">
+            <h2 class="text-4xl font-bold mb-4" id="gameOverTitle" data-i18n="game_over">राजनीतिक करियर समाप्त!</h2>
+            <p class="text-lg mb-6" id="gameOverMessage" data-i18n="career_ended">तपाईंको नेतृत्व समाप्त भएको छ।</p>
+            <div id="finalStats" class="bg-gray-100 rounded-lg p-4 mb-6">
+                <!-- Final statistics populated by JS -->
+            </div>
+            <div class="flex justify-center space-x-4">
+                <button id="playAgainBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg text-lg" data-i18n="play_again">
+                    फेरि खेल्नुहोस्
+                </button>
+                <button id="analyzeGameBtn" class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg text-lg" data-i18n="analyze_game">
+                    निर्णयहरू विश्लेषण गर्नुहोस्
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="optimized-game-engine.js"></script>
+</body>
+</html>

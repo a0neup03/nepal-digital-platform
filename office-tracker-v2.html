@@ -1,0 +1,1630 @@
+<!DOCTYPE html>
+<html lang="ne">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nepal Office Tracker | नेपाल कार्यालय ट्रयाकर</title>
+    
+    <!-- Fonts and Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary-color: #8b5cf6;
+            --accent-color: #f59e0b;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --info-color: #3b82f6;
+            
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8fafc;
+            --bg-tertiary: #f1f5f9;
+            --bg-card: #ffffff;
+            
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --text-muted: #94a3b8;
+            --text-light: #cbd5e1;
+            
+            --border-color: #e2e8f0;
+            --border-focus: #6366f1;
+            
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+            
+            --radius-sm: 0.375rem;
+            --radius-md: 0.5rem;
+            --radius-lg: 0.75rem;
+            --radius-xl: 1rem;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Noto Sans Devanagari', 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: white;
+        }
+        
+        .header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .header .subtitle {
+            font-size: 1rem;
+            opacity: 0.9;
+            font-weight: 400;
+            margin-bottom: 1rem;
+        }
+        
+        .empathy-message {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            color: white;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .empathy-message .icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .tracker-container {
+            background: var(--bg-card);
+            border-radius: var(--radius-xl);
+            padding: 2rem;
+            box-shadow: var(--shadow-xl);
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .tracker-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+        }
+        
+        .step {
+            display: none;
+            animation: slideIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        
+        .step.active {
+            display: block;
+        }
+        
+        @keyframes slideIn {
+            from { 
+                opacity: 0; 
+                transform: translateX(30px);
+            }
+            to { 
+                opacity: 1; 
+                transform: translateX(0);
+            }
+        }
+        
+        .step-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .step-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border-radius: 50%;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+        
+        .step-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .step-description {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        
+        .quick-select {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .quick-option {
+            padding: 1.5rem;
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            background: var(--bg-secondary);
+        }
+        
+        .quick-option:hover {
+            border-color: var(--primary-color);
+            background: var(--bg-primary);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .quick-option.selected {
+            border-color: var(--primary-color);
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .quick-option .icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+        
+        .quick-option .title {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+        
+        .quick-option .subtitle {
+            font-size: 0.875rem;
+            opacity: 0.8;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-label {
+            display: block;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+        }
+        
+        .form-select, .form-input, .form-textarea {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: var(--bg-primary);
+            font-family: inherit;
+        }
+        
+        .form-select:focus, .form-input:focus, .form-textarea:focus {
+            outline: none;
+            border-color: var(--border-focus);
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+        }
+        
+        .form-textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+        
+        .timer-section {
+            text-align: center;
+            margin: 2rem 0;
+        }
+        
+        .timer-display {
+            padding: 3rem 2rem;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: var(--radius-xl);
+            color: white;
+            margin-bottom: 2rem;
+        }
+        
+        .timer-time {
+            font-size: 4rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            font-feature-settings: "tnum";
+        }
+        
+        .timer-label {
+            font-size: 1.125rem;
+            opacity: 0.9;
+        }
+        
+        .timer-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+        
+        .mood-selection {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+        
+        .mood-option {
+            padding: 1.5rem 1rem;
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            background: var(--bg-secondary);
+        }
+        
+        .mood-option:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+        }
+        
+        .mood-option.selected {
+            border-color: var(--primary-color);
+            background: var(--primary-color);
+            color: white;
+        }
+        
+        .mood-option .emoji {
+            font-size: 2rem;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+        
+        .mood-option .label {
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        
+        .rating-grid {
+            display: grid;
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+        
+        .rating-item {
+            padding: 1.5rem;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            background: var(--bg-secondary);
+        }
+        
+        .rating-question {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+        
+        .star-rating {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+            margin-bottom: 1rem;
+        }
+        
+        .star {
+            font-size: 2rem;
+            color: var(--text-light);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            user-select: none;
+        }
+        
+        .star:hover,
+        .star.active {
+            color: #fbbf24;
+            transform: scale(1.1);
+            text-shadow: 0 0 10px #fbbf24;
+        }
+        
+        .yes-no-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+        
+        .yes-no-btn {
+            flex: 1;
+            max-width: 150px;
+            padding: 1rem;
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            background: var(--bg-primary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            font-weight: 500;
+        }
+        
+        .yes-no-btn:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+        }
+        
+        .yes-no-btn.selected {
+            border-color: var(--primary-color);
+            background: var(--primary-color);
+            color: white;
+        }
+        
+        .yes-no-btn.danger.selected {
+            border-color: var(--danger-color);
+            background: var(--danger-color);
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 3rem;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: var(--radius-lg);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            min-width: 140px;
+            justify-content: center;
+            font-family: inherit;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .btn-secondary {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border: 2px solid var(--border-color);
+        }
+        
+        .btn-secondary:hover {
+            border-color: var(--primary-color);
+            background: var(--bg-primary);
+        }
+        
+        .btn-success {
+            background: var(--success-color);
+            color: white;
+        }
+        
+        .btn-warning {
+            background: var(--warning-color);
+            color: white;
+        }
+        
+        .btn-danger {
+            background: var(--danger-color);
+            color: white;
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+        
+        .progress-indicator {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .progress-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--text-light);
+            transition: all 0.3s ease;
+        }
+        
+        .progress-dot.active {
+            background: var(--primary-color);
+            transform: scale(1.2);
+        }
+        
+        .progress-dot.completed {
+            background: var(--success-color);
+        }
+        
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            margin-bottom: 1rem;
+            transition: color 0.3s ease;
+            font-size: 0.9rem;
+        }
+        
+        .back-link:hover {
+            color: white;
+        }
+        
+        .back-link i {
+            margin-right: 0.5rem;
+        }
+        
+        .success-animation {
+            text-align: center;
+            padding: 3rem 2rem;
+        }
+        
+        .success-icon {
+            font-size: 5rem;
+            color: var(--success-color);
+            margin-bottom: 1rem;
+            animation: bounce 1s ease-in-out;
+        }
+        
+        @keyframes bounce {
+            0%, 20%, 60%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-20px); }
+            80% { transform: translateY(-10px); }
+        }
+        
+        .skip-option {
+            text-align: center;
+            margin-top: 1rem;
+        }
+        
+        .skip-link {
+            color: var(--text-muted);
+            text-decoration: underline;
+            cursor: pointer;
+            font-size: 0.875rem;
+        }
+        
+        .skip-link:hover {
+            color: var(--text-secondary);
+        }
+        
+        .help-text {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            margin-top: 0.5rem;
+            text-align: center;
+        }
+        
+        .encouragement {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            padding: 1rem;
+            border-radius: var(--radius-lg);
+            text-align: center;
+            margin: 1rem 0;
+            font-weight: 500;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 0.5rem;
+            }
+            
+            .tracker-container {
+                padding: 1.5rem;
+                margin: 1rem 0;
+            }
+            
+            .header h1 {
+                font-size: 1.75rem;
+            }
+            
+            .timer-time {
+                font-size: 3rem;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .btn {
+                width: 100%;
+                max-width: 300px;
+            }
+            
+            .quick-select {
+                grid-template-columns: 1fr;
+            }
+            
+            .mood-selection {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="index.html" class="back-link">
+            <i class="fas fa-arrow-left"></i>
+            मुख्य पृष्ठमा फर्कनुहोस्
+        </a>
+        
+        <div class="header">
+            <h1>🏛️ Nepal Office Tracker</h1>
+            <p class="subtitle">तपाईंको अनुभव साझा गर्नुहोस् - एकसाथ सुधार गरौं</p>
+        </div>
+        
+        <div class="empathy-message">
+            <div class="icon">🤗</div>
+            <p><strong>हामी बुझ्छौं</strong> - सरकारी कार्यालयमा जानु कहिलेकाहीं निराशाजनक हुन्छ।<br>
+            तपाईंको अनुभवले अरूलाई मद्दत गर्नेछ र सेवा सुधार गर्नेछ।</p>
+        </div>
+        
+        <div class="tracker-container">
+            <div class="progress-indicator">
+                <div class="progress-dot active" id="dot1"></div>
+                <div class="progress-dot" id="dot2"></div>
+                <div class="progress-dot" id="dot3"></div>
+                <div class="progress-dot" id="dot4"></div>
+                <div class="progress-dot" id="dot5"></div>
+            </div>
+            
+            <!-- Step 1: Quick Start -->
+            <div class="step active" id="step1">
+                <div class="step-header">
+                    <div class="step-number">1</div>
+                    <h2 class="step-title">कहाँ जानुभयो?</h2>
+                    <p class="step-description">सबैभन्दा सामान्य ठाउँहरू छनोट गर्नुहोस्</p>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">प्रदेश छान्नुहोस्:</label>
+                    <select class="form-select" id="provinceSelect">
+                        <option value="">प्रदेश छान्नुहोस्...</option>
+                        <option value="bagmati">बागमती प्रदेश</option>
+                        <option value="madhesh">मधेश प्रदेश</option>
+                        <option value="lumbini">लुम्बिनी प्रदेश</option>
+                        <option value="gandaki">गण्डकी प्रदेश</option>
+                        <option value="karnali">कर्णाली प्रदेश</option>
+                        <option value="sudurpaschim">सुदूरपश्चिम प्रदेश</option>
+                        <option value="koshi">कोशी प्रदेश</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">जिल्ला छान्नुहोस्:</label>
+                    <select class="form-select" id="districtSelect" disabled>
+                        <option value="">पहिले प्रदेश छान्नुहोस्...</option>
+                    </select>
+                </div>
+                
+                <div class="form-group" id="wardGroup" style="display: none;">
+                    <label class="form-label">वडा छान्नुहोस् (यदि लागू छ):</label>
+                    <select class="form-select" id="wardSelect">
+                        <option value="">वडा छान्नुहोस्...</option>
+                        <option value="1">वडा नं. १</option>
+                        <option value="2">वडा नं. २</option>
+                        <option value="3">वडा नं. ३</option>
+                        <option value="4">वडा नं. ४</option>
+                        <option value="5">वडा नं. ५</option>
+                        <option value="6">वडा नं. ६</option>
+                        <option value="7">वडा नं. ७</option>
+                        <option value="8">वडा नं. ८</option>
+                        <option value="9">वडा नं. ९</option>
+                        <option value="10">वडा नं. १०</option>
+                        <option value="11">वडा नं. ११</option>
+                        <option value="12">वडा नं. १२</option>
+                        <option value="13">वडा नं. १३</option>
+                        <option value="14">वडा नं. १४</option>
+                        <option value="15">वडा नं. १५</option>
+                        <option value="16">वडा नं. १६</option>
+                        <option value="17">वडा नं. १७</option>
+                        <option value="18">वडा नं. १८</option>
+                        <option value="19">वडा नं. १९</option>
+                        <option value="20">वडा नं. २०</option>
+                        <option value="21">वडा नं. २१</option>
+                        <option value="22">वडा नं. २२</option>
+                        <option value="23">वडा नं. २३</option>
+                        <option value="24">वडा नं. २४</option>
+                        <option value="25">वडा नं. २५</option>
+                        <option value="26">वडा नं. २६</option>
+                        <option value="27">वडा नं. २७</option>
+                        <option value="28">वडा नं. २८</option>
+                        <option value="29">वडा नं. २९</option>
+                        <option value="30">वडा नं. ३०</option>
+                        <option value="31">वडा नं. ३१</option>
+                        <option value="32">वडा नं. ३२</option>
+                    </select>
+                </div>
+                
+                <div class="action-buttons">
+                    <button class="btn btn-primary" onclick="nextStep()" id="step1Next" disabled>
+                        अर्को चरण <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+                
+                <div class="skip-option">
+                    <span class="skip-link" onclick="showDetailedForm()">
+                        विस्तृत विकल्प चाहिन्छ? यहाँ थिच्नुहोस्
+                    </span>
+                </div>
+            </div>
+            
+            <!-- Step 2: Service Type -->
+            <div class="step" id="step2">
+                <div class="step-header">
+                    <div class="step-number">2</div>
+                    <h2 class="step-title">के काम गर्न जानुभयो?</h2>
+                    <p class="step-description">सबैभन्दा सामान्य सेवाहरू</p>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">कार्यालयको प्रकार छान्नुहोस्:</label>
+                    <select class="form-select" id="officeTypeSelect">
+                        <option value="">कार्यालयको प्रकार छान्नुहोस्...</option>
+                        <optgroup label="जिल्ला तहका कार्यालयहरू">
+                            <option value="district_admin">🏛️ जिल्ला प्रशासन कार्यालय</option>
+                            <option value="passport_office">📘 राहदानी कार्यालय</option>
+                            <option value="transport_office">🚗 यातायात व्यवस्था कार्यालय</option>
+                            <option value="land_registry">🏞️ मालपोत कार्यालय</option>
+                            <option value="district_court">⚖️ जिल्ला अदालत</option>
+                            <option value="district_health">🏥 जिल्ला स्वास्थ्य कार्यालय</option>
+                            <option value="district_education">📚 जिल्ला शिक्षा कार्यालय</option>
+                        </optgroup>
+                        <optgroup label="स्थानीय तहका कार्यालयहरू">
+                            <option value="ward_office">🏢 वडा कार्यालय</option>
+                            <option value="municipality">🏛️ नगरपालिका/गाउँपालिका</option>
+                            <option value="rural_municipality">🏡 गाउँपालिका</option>
+                        </optgroup>
+                        <optgroup label="सेवा केन्द्रहरू">
+                            <option value="nagarik_app">📱 नागरिक एप केन्द्र</option>
+                            <option value="one_door_service">🚪 एकढोका सेवा</option>
+                            <option value="citizen_service">👥 नागरिक सेवा केन्द्र</option>
+                        </optgroup>
+                        <optgroup label="विशेष कार्यालयहरू">
+                            <option value="bank">🏦 बैंक/वित्तीय संस्था</option>
+                            <option value="cooperative">🤝 सहकारी संस्था</option>
+                            <option value="police_station">👮 प्रहरी कार्यालय</option>
+                            <option value="tax_office">💰 राजस्व कार्यालय</option>
+                        </optgroup>
+                        <option value="other">📋 अन्य कार्यालय</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">के सेवा लिन जानुभयो?</label>
+                    <select class="form-select" id="serviceSelect">
+                        <option value="">सेवा छान्नुहोस्...</option>
+                        <optgroup label="कागजातहरू">
+                            <option value="citizenship_new">🆔 नागरिकता (नयाँ)</option>
+                            <option value="citizenship_renew">🆔 नागरिकता (नवीकरण)</option>
+                            <option value="passport_new">📘 राहदानी (नयाँ)</option>
+                            <option value="passport_renew">📘 राहदानी (नवीकरण)</option>
+                            <option value="birth_certificate">👶 जन्म दर्ता प्रमाणपत्र</option>
+                            <option value="marriage_certificate">💒 विवाह दर्ता प्रमाणपत्र</option>
+                            <option value="death_certificate">⚰️ मृत्यु दर्ता प्रमाणपत्र</option>
+                            <option value="migration_certificate">🏠 बसाइसराई प्रमाणपत्र</option>
+                        </optgroup>
+                        <optgroup label="लाइसेन्स र अनुमतिपत्र">
+                            <option value="driving_license_new">🚗 सवारी चालक अनुमतिपत्र (नयाँ)</option>
+                            <option value="driving_license_renew">🚗 सवारी चालक अनुमतिपत्र (नवीकरण)</option>
+                            <option value="vehicle_registration">📋 सवारी साधन दर्ता</option>
+                            <option value="business_license">💼 व्यवसाय दर्ता</option>
+                            <option value="company_registration">🏢 कम्पनी दर्ता</option>
+                        </optgroup>
+                        <optgroup label="जग्गा सम्बन्धी">
+                            <option value="land_ownership">📜 जग्गाधनी प्रमाणपत्र</option>
+                            <option value="land_registration">🏞️ जग्गा दर्ता</option>
+                            <option value="house_registration">🏡 घर दर्ता</option>
+                            <option value="property_transfer">🔄 सम्पत्ति हस्तान्तरण</option>
+                        </optgroup>
+                        <optgroup label="बैंकिङ सेवा">
+                            <option value="bank_account">💳 बैंक खाता खोल्ने</option>
+                            <option value="loan_application">💰 ऋण निवेदन</option>
+                            <option value="remittance">💸 रेमिट्यान्स</option>
+                        </optgroup>
+                        <optgroup label="अन्य सेवाहरू">
+                            <option value="pension">👴 पेन्सन</option>
+                            <option value="social_security">🛡️ सामाजिक सुरक्षा</option>
+                            <option value="tax_clearance">💰 कर चुक्ता प्रमाणपत्र</option>
+                            <option value="health_services">🏥 स्वास्थ्य सेवा</option>
+                            <option value="education_services">📚 शैक्षिक सेवा</option>
+                        </optgroup>
+                        <option value="other">📋 अन्य सेवा</option>
+                    </select>
+                </div>
+                
+                <div class="action-buttons">
+                    <button class="btn btn-secondary" onclick="prevStep()">
+                        <i class="fas fa-arrow-left"></i> पछाडि
+                    </button>
+                    <button class="btn btn-primary" onclick="nextStep()" id="step2Next" disabled>
+                        टाइमर सुरु गर्नुहोस् <i class="fas fa-clock"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Step 3: Timer -->
+            <div class="step" id="step3">
+                <div class="step-header">
+                    <div class="step-number">3</div>
+                    <h2 class="step-title">समय गिनिरहेका छौं</h2>
+                    <p class="step-description">कार्यालयमा बसेको समय ट्रयाक गरिरहेका छौं</p>
+                </div>
+                
+                <div class="timer-section">
+                    <div class="timer-display">
+                        <div class="timer-time" id="timerDisplay">00:00:00</div>
+                        <div class="timer-label">समय बितेको</div>
+                    </div>
+                    
+                    <div class="encouragement">
+                        <i class="fas fa-heart"></i> धैर्य गर्नुहोस् - तपाईंको समय मूल्यवान छ
+                    </div>
+                </div>
+                
+                <div class="action-buttons">
+                    <button class="btn btn-success" onclick="completeService()">
+                        <i class="fas fa-check-circle"></i> काम सकियो
+                    </button>
+                    <button class="btn btn-warning" onclick="partialComplete()">
+                        <i class="fas fa-pause-circle"></i> आधा मात्र सकियो
+                    </button>
+                    <button class="btn btn-danger" onclick="failedService()">
+                        <i class="fas fa-times-circle"></i> काम भएन
+                    </button>
+                </div>
+                
+                <div class="help-text">
+                    कुनै पनि बटन थिचेर आफ्नो अनुभव साझा गर्न सक्नुहुन्छ
+                </div>
+            </div>
+            
+            <!-- Step 4: Quick Feedback -->
+            <div class="step" id="step4">
+                <div class="step-header">
+                    <div class="step-number">4</div>
+                    <h2 class="step-title">आज तपाईंलाई यहाँको काम कस्तो लाग्यो?</h2>
+                    <p class="step-description">छिटो र सजिलो तरिकाले बताउनुहोस्</p>
+                </div>
+                
+                <div class="mood-selection" id="moodSelect">
+                    <div class="mood-option" data-mood="excellent">
+                        <span class="emoji">😊</span>
+                        <div class="label">उत्कृष्ट</div>
+                    </div>
+                    <div class="mood-option" data-mood="good">
+                        <span class="emoji">🙂</span>
+                        <div class="label">राम्रो</div>
+                    </div>
+                    <div class="mood-option" data-mood="okay">
+                        <span class="emoji">😐</span>
+                        <div class="label">ठीकै</div>
+                    </div>
+                    <div class="mood-option" data-mood="poor">
+                        <span class="emoji">🙁</span>
+                        <div class="label">नराम्रो</div>
+                    </div>
+                    <div class="mood-option" data-mood="terrible">
+                        <span class="emoji">😞</span>
+                        <div class="label">खराब</div>
+                    </div>
+                </div>
+                
+                <div class="rating-grid">
+                    <div class="rating-item">
+                        <div class="rating-question">
+                            <i class="fas fa-money-bill" style="color: var(--danger-color);"></i>
+                            के घुस माग्यो?
+                        </div>
+                        <div class="yes-no-buttons">
+                            <div class="yes-no-btn danger" data-bribe="yes">
+                                छ माग्यो 😠
+                            </div>
+                            <div class="yes-no-btn" data-bribe="no">
+                                छैन मागेन 😊
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="rating-item">
+                        <div class="rating-question">
+                            <i class="fas fa-user-tie" style="color: var(--warning-color);"></i>
+                            दलाल (बिचौलिया) प्रयोग गर्नुपर्यो?
+                        </div>
+                        <div class="yes-no-buttons">
+                            <div class="yes-no-btn danger" data-dalaal="yes">
+                                गर्नुपर्यो 😤
+                            </div>
+                            <div class="yes-no-btn" data-dalaal="no">
+                                आवश्यक भएन 👍
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="rating-item">
+                        <div class="rating-question">
+                            <i class="fas fa-file-alt" style="color: var(--warning-color);"></i>
+                            अनावश्यक कागजात माग्यो?
+                        </div>
+                        <div class="yes-no-buttons">
+                            <div class="yes-no-btn danger" data-unnecessary="yes">
+                                धेरै फालतु 📄
+                            </div>
+                            <div class="yes-no-btn" data-unnecessary="no">
+                                उचित मात्र ✅
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="rating-item">
+                        <div class="rating-question">
+                            <i class="fas fa-database" style="color: var(--info-color);"></i>
+                            अन्य कार्यालयबाट लिएर आउनुपर्ने कागजात जुन उनीहरूसँग नै हुनुपर्ने थियो?
+                        </div>
+                        <div class="yes-no-buttons">
+                            <div class="yes-no-btn danger" data-redundant="yes">
+                                फेरि भर्नुपर्यो 😑
+                            </div>
+                            <div class="yes-no-btn" data-redundant="no">
+                                स्वतः भरिएको 🚀
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="rating-item">
+                        <div class="rating-question">
+                            <i class="fas fa-users" style="color: var(--info-color);"></i>
+                            कर्मचारीको व्यवहार कस्तो थियो?
+                        </div>
+                        <div class="star-rating" data-rating="staff">
+                            <span class="star" data-value="1">★</span>
+                            <span class="star" data-value="2">★</span>
+                            <span class="star" data-value="3">★</span>
+                            <span class="star" data-value="4">★</span>
+                            <span class="star" data-value="5">★</span>
+                        </div>
+                    </div>
+                    
+                    <div class="rating-item">
+                        <div class="rating-question">
+                            <i class="fas fa-cogs" style="color: var(--primary-color);"></i>
+                            प्रक्रिया कति सजिलो थियो?
+                        </div>
+                        <div class="star-rating" data-rating="process">
+                            <span class="star" data-value="1">★</span>
+                            <span class="star" data-value="2">★</span>
+                            <span class="star" data-value="3">★</span>
+                            <span class="star" data-value="4">★</span>
+                            <span class="star" data-value="5">★</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-comment"></i> के भन्न चाहनुहुन्छ? (वैकल्पिक)
+                    </label>
+                    <textarea class="form-textarea" id="quickComment" 
+                              placeholder="आफ्नो अनुभव छोटकरीमा लेख्नुहोस्..."></textarea>
+                </div>
+                
+                <div class="action-buttons">
+                    <button class="btn btn-secondary" onclick="prevStep()">
+                        <i class="fas fa-arrow-left"></i> पछाडि
+                    </button>
+                    <button class="btn btn-primary" onclick="submitFeedback()">
+                        <i class="fas fa-paper-plane"></i> पेश गर्नुहोस्
+                    </button>
+                </div>
+                
+                <div class="skip-option">
+                    <span class="skip-link" onclick="submitFeedback()">
+                        केही नभनेर पनि पेश गर्न सक्नुहुन्छ
+                    </span>
+                </div>
+            </div>
+            
+            <!-- Step 5: Thank You -->
+            <div class="step" id="step5">
+                <div class="step-header">
+                    <div class="step-number">✓</div>
+                    <h2 class="step-title">धेरै धेरै धन्यवाद!</h2>
+                    <p class="step-description">तपाईंको योगदानले नेपाल सुधार गर्नेछ</p>
+                </div>
+                
+                <div class="success-animation">
+                    <div class="success-icon">🙏</div>
+                    <p style="font-size: 1.125rem; color: var(--text-secondary); margin-bottom: 2rem;">
+                        <strong>तपाईंको आवाज सुनियो!</strong><br>
+                        यस्तै साझा गरेर हामी मिलेर नेपालको सेवा सुधार गर्नेछौं।
+                    </p>
+                    
+                    <div style="background: var(--bg-secondary); padding: 1.5rem; border-radius: var(--radius-lg); margin: 2rem 0;">
+                        <h3 style="color: var(--text-primary); margin-bottom: 1rem;">तपाईंको सारांश:</h3>
+                        <div id="feedbackSummary" style="color: var(--text-secondary);"></div>
+                    </div>
+                </div>
+                
+                <div class="action-buttons">
+                    <button class="btn btn-primary" onclick="resetTracker()">
+                        <i class="fas fa-plus"></i> अर्को ट्रयाकिङ
+                    </button>
+                    <a href="unified-nepal-platform.html" class="btn btn-secondary">
+                        <i class="fas fa-home"></i> मुख्य पृष्ठ
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentStep = 1;
+        let timerInterval;
+        let startTime;
+        let trackingData = {
+            province: '',
+            district: '',
+            ward: '',
+            officeType: '',
+            service: '',
+            mood: '',
+            bribeAsked: '',
+            dalaalNeeded: '',
+            unnecessaryDocs: '',
+            redundantData: '',
+            staffRating: 0,
+            processRating: 0,
+            comment: '',
+            duration: '',
+            outcome: ''
+        };
+        
+        // Services by office type - Smart filtering
+        const servicesByOfficeType = {
+            district_admin: [
+                {value: 'citizenship_new', text: '🆔 नागरिकता (नयाँ)'},
+                {value: 'citizenship_renew', text: '🆔 नागरिकता (नवीकरण)'},
+                {value: 'birth_certificate', text: '👶 जन्म दर्ता प्रमाणपत्र'},
+                {value: 'marriage_certificate', text: '💒 विवाह दर्ता प्रमाणपत्र'},
+                {value: 'death_certificate', text: '⚰️ मृत्यु दर्ता प्रमाणपत्र'},
+                {value: 'migration_certificate', text: '🏠 बसाइसराई प्रमाणपत्र'},
+                {value: 'character_certificate', text: '📜 चरित्र प्रमाणपत्र'}
+            ],
+            passport_office: [
+                {value: 'passport_new', text: '📘 राहदानी (नयाँ)'},
+                {value: 'passport_renew', text: '📘 राहदानी (नवीकरण)'},
+                {value: 'passport_lost', text: '📘 राहदानी (हराएको)'},
+                {value: 'passport_damage', text: '📘 राहदानी (बिग्रिएको)'}
+            ],
+            transport_office: [
+                {value: 'driving_license_new', text: '🚗 सवारी चालक अनुमतिपत्र (नयाँ)'},
+                {value: 'driving_license_renew', text: '🚗 सवारी चालक अनुमतिपत्र (नवीकरण)'},
+                {value: 'vehicle_registration', text: '📋 सवारी साधन दर्ता'},
+                {value: 'vehicle_transfer', text: '🔄 सवारी साधन स्वामित्व सारुवा'},
+                {value: 'license_duplicate', text: '📄 अनुमतिपत्र डुप्लिकेट'}
+            ],
+            land_registry: [
+                {value: 'land_ownership', text: '📜 जग्गाधनी प्रमाणपत्र'},
+                {value: 'land_registration', text: '🏞️ जग्गा दर्ता'},
+                {value: 'house_registration', text: '🏡 घर दर्ता'},
+                {value: 'property_transfer', text: '🔄 सम्पत्ति हस्तान्तरण'},
+                {value: 'land_mapping', text: '🗺️ नक्सा पास'},
+                {value: 'land_tax', text: '💰 मालपोत कर'}
+            ],
+            district_court: [
+                {value: 'civil_case', text: '⚖️ दिवानी मुद्दा'},
+                {value: 'criminal_case', text: '🚔 फौजदारी मुद्दा'},
+                {value: 'family_case', text: '👨‍👩‍👧‍👦 पारिवारिक मुद्दा'},
+                {value: 'bail_application', text: '🏃‍♂️ धरौट निवेदन'},
+                {value: 'court_certificate', text: '📋 अदालती प्रमाणपत्र'}
+            ],
+            district_health: [
+                {value: 'health_services', text: '🏥 स्वास्थ्य सेवा'},
+                {value: 'vaccination', text: '💉 खोप कार्यक्रम'},
+                {value: 'health_insurance', text: '🛡️ स्वास्थ्य बीमा'},
+                {value: 'medical_certificate', text: '📋 स्वास्थ्य प्रमाणपत्र'}
+            ],
+            district_education: [
+                {value: 'education_services', text: '📚 शैक्षिक सेवा'},
+                {value: 'scholarship', text: '🎓 छात्रवृत्ति'},
+                {value: 'school_registration', text: '🏫 विद्यालय दर्ता'},
+                {value: 'education_certificate', text: '📜 शैक्षिक प्रमाणपत्र'}
+            ],
+            ward_office: [
+                {value: 'ward_recommendation', text: '📋 वडा सिफारिस'},
+                {value: 'senior_citizen', text: '👴 ज्येष्ठ नागरिक परिचयपत्र'},
+                {value: 'poor_id', text: '🏚️ गरिब परिचयपत्र'},
+                {value: 'local_certificate', text: '📄 स्थानीय प्रमाणपत्र'}
+            ],
+            municipality: [
+                {value: 'business_license', text: '💼 व्यवसाय दर्ता'},
+                {value: 'building_permit', text: '🏗️ भवन निर्माण अनुमति'},
+                {value: 'tax_clearance', text: '💰 कर चुक्ता प्रमाणपत्र'},
+                {value: 'waste_management', text: '🗑️ फोहोर व्यवस्थापन'}
+            ],
+            rural_municipality: [
+                {value: 'agriculture_subsidy', text: '🌾 कृषि अनुदान'},
+                {value: 'rural_development', text: '🚜 ग्रामीण विकास'},
+                {value: 'cooperative_registration', text: '🤝 सहकारी दर्ता'},
+                {value: 'rural_certificate', text: '📜 ग्रामीण प्रमाणपत्र'}
+            ],
+            bank: [
+                {value: 'bank_account', text: '💳 बैंक खाता खोल्ने'},
+                {value: 'loan_application', text: '💰 ऋण निवेदन'},
+                {value: 'remittance', text: '💸 रेमिट्यान्स'},
+                {value: 'bank_certificate', text: '🏦 बैंक प्रमाणपत्र'}
+            ],
+            cooperative: [
+                {value: 'cooperative_membership', text: '🤝 सहकारी सदस्यता'},
+                {value: 'cooperative_loan', text: '💰 सहकारी ऋण'},
+                {value: 'cooperative_saving', text: '💰 सहकारी बचत'}
+            ],
+            police_station: [
+                {value: 'police_report', text: '🚔 प्रहरी रिपोर्ट'},
+                {value: 'character_verification', text: '👮 चरित्र प्रमाणीकरण'},
+                {value: 'lost_item_report', text: '📋 हराएको सामान रिपोर्ट'},
+                {value: 'police_clearance', text: '🛡️ प्रहरी क्लिरेन्स'}
+            ],
+            tax_office: [
+                {value: 'tax_registration', text: '📋 कर दर्ता'},
+                {value: 'tax_clearance', text: '💰 कर चुक्ता प्रमाणपत्र'},
+                {value: 'vat_registration', text: '📊 भ्याट दर्ता'}
+            ],
+            nagarik_app: [
+                {value: 'digital_services', text: '📱 डिजिटल सेवाहरू'},
+                {value: 'online_application', text: '💻 अनलाइन निवेदन'},
+                {value: 'app_support', text: '🛠️ एप सहयोग'}
+            ],
+            one_door_service: [
+                {value: 'integrated_service', text: '🚪 एकीकृत सेवा'},
+                {value: 'quick_service', text: '⚡ छिटो सेवा'},
+                {value: 'multiple_certificates', text: '📋 धेरै प्रमाणपत्र'}
+            ],
+            citizen_service: [
+                {value: 'citizen_support', text: '👥 नागरिक सहयोग'},
+                {value: 'information_service', text: 'ℹ️ सूचना सेवा'},
+                {value: 'complaint_service', text: '📢 गुनासो सेवा'}
+            ]
+        };
+        
+        // Smart service filtering function
+        function updateServiceOptions(officeType) {
+            const serviceSelect = document.getElementById('serviceSelect');
+            
+            // Clear current options
+            serviceSelect.innerHTML = '<option value="">सेवा छान्नुहोस्...</option>';
+            
+            if (officeType && servicesByOfficeType[officeType]) {
+                // Add office-specific services
+                servicesByOfficeType[officeType].forEach(service => {
+                    const option = document.createElement('option');
+                    option.value = service.value;
+                    option.textContent = service.text;
+                    serviceSelect.appendChild(option);
+                });
+                
+                // Add "Other" option
+                const otherOption = document.createElement('option');
+                otherOption.value = 'other';
+                otherOption.textContent = '📋 अन्य सेवा';
+                serviceSelect.appendChild(otherOption);
+                
+                serviceSelect.disabled = false;
+            } else {
+                // Reset to all services if no office type selected
+                serviceSelect.innerHTML = `
+                    <option value="">सेवा छान्नुहोस्...</option>
+                    <optgroup label="कागजातहरू">
+                        <option value="citizenship_new">🆔 नागरिकता (नयाँ)</option>
+                        <option value="citizenship_renew">🆔 नागरिकता (नवीकरण)</option>
+                        <option value="passport_new">📘 राहदानी (नयाँ)</option>
+                        <option value="passport_renew">📘 राहदानी (नवीकरण)</option>
+                        <option value="birth_certificate">👶 जन्म दर्ता प्रमाणपत्र</option>
+                        <option value="marriage_certificate">💒 विवाह दर्ता प्रमाणपत्र</option>
+                        <option value="death_certificate">⚰️ मृत्यु दर्ता प्रमाणपत्र</option>
+                        <option value="migration_certificate">🏠 बसाइसराई प्रमाणपत्र</option>
+                    </optgroup>
+                    <optgroup label="लाइसेन्स र अनुमतिपत्र">
+                        <option value="driving_license_new">🚗 सवारी चालक अनुमतिपत्र (नयाँ)</option>
+                        <option value="driving_license_renew">🚗 सवारी चालक अनुमतिपत्र (नवीकरण)</option>
+                        <option value="vehicle_registration">📋 सवारी साधन दर्ता</option>
+                        <option value="business_license">💼 व्यवसाय दर्ता</option>
+                        <option value="company_registration">🏢 कम्पनी दर्ता</option>
+                    </optgroup>
+                    <optgroup label="जग्गा सम्बन्धी">
+                        <option value="land_ownership">📜 जग्गाधनी प्रमाणपत्र</option>
+                        <option value="land_registration">🏞️ जग्गा दर्ता</option>
+                        <option value="house_registration">🏡 घर दर्ता</option>
+                        <option value="property_transfer">🔄 सम्पत्ति हस्तान्तरण</option>
+                    </optgroup>
+                    <optgroup label="बैंकिङ सेवा">
+                        <option value="bank_account">💳 बैंक खाता खोल्ने</option>
+                        <option value="loan_application">💰 ऋण निवेदन</option>
+                        <option value="remittance">💸 रेमिट्यान्स</option>
+                    </optgroup>
+                    <optgroup label="अन्य सेवाहरू">
+                        <option value="pension">👴 पेन्सन</option>
+                        <option value="social_security">🛡️ सामाजिक सुरक्षा</option>
+                        <option value="tax_clearance">💰 कर चुक्ता प्रमाणपत्र</option>
+                        <option value="health_services">🏥 स्वास्थ्य सेवा</option>
+                        <option value="education_services">📚 शैक्षिक सेवा</option>
+                    </optgroup>
+                    <option value="other">📋 अन्य सेवा</option>
+                `;
+                serviceSelect.disabled = false;
+            }
+            
+            // Reset service selection
+            trackingData.service = '';
+            checkStep2Complete();
+        }
+        
+        // District data by province
+        const districtsByProvince = {
+            bagmati: [
+                'काठमाडौं', 'ललितपुर', 'भक्तपुर', 'नुवाकोट', 'रसुवा', 'धादिङ्ग',
+                'काभ्रेपलाञ्चोक', 'सिन्धुली', 'दोलखा', 'सर्लाही', 'महोत्तरी', 
+                'रौतहट', 'बारा', 'पर्सा', 'चितवन'
+            ],
+            madhesh: [
+                'सप्तरी', 'सिराहा', 'धनुषा', 'महोत्तरी', 'सर्लाही', 'रौतहट', 'बारा', 'पर्सा'
+            ],
+            lumbini: [
+                'रुपन्देही', 'कपिलवस्तु', 'पाल्पा', 'नवलपरासी पूर्व', 'नवलपरासी पश्चिम',
+                'गुल्मी', 'अर्घाखाँची', 'प्युठान', 'रोल्पा', 'दाङ', 'बाँके', 'बर्दिया'
+            ],
+            gandaki: [
+                'गोरखा', 'लमजुङ', 'तनहुँ', 'स्याङ्जा', 'कास्की', 'मनाङ', 'मुस्ताङ',
+                'म्याग्दी', 'पर्वत', 'बागलुङ', 'नवलपुर'
+            ],
+            karnali: [
+                'डोल्पा', 'जुम्ला', 'कालिकोट', 'मुगु', 'हुम्ला', 'सुर्खेत',
+                'दैलेख', 'जाजरकोट', 'रुकुम पश्चिम', 'सल्यान'
+            ],
+            sudurpaschim: [
+                'अछाम', 'डोटी', 'बैतडी', 'दार्चुला', 'बझाङ', 'बाजुरा',
+                'कैलाली', 'कञ्चनपुर', 'डडेल्धुरा'
+            ],
+            koshi: [
+                'झापा', 'इलाम', 'पाँचथर', 'ताप्लेजुङ', 'संखुवासभा', 'तेह्रथुम',
+                'धनकुटा', 'भोजपुर', 'सोलुखुम्बु', 'खोटाङ', 'ओखलढुंगा', 'उदयपुर',
+                'सुनसरी', 'मोरङ'
+            ]
+        };
+        
+        function updateProgressDots() {
+            for (let i = 1; i <= 5; i++) {
+                const dot = document.getElementById(`dot${i}`);
+                if (i < currentStep) {
+                    dot.className = 'progress-dot completed';
+                } else if (i === currentStep) {
+                    dot.className = 'progress-dot active';
+                } else {
+                    dot.className = 'progress-dot';
+                }
+            }
+        }
+        
+        function nextStep() {
+            if (currentStep === 2) {
+                startTimer();
+            }
+            
+            document.getElementById(`step${currentStep}`).classList.remove('active');
+            currentStep++;
+            document.getElementById(`step${currentStep}`).classList.add('active');
+            updateProgressDots();
+        }
+        
+        function prevStep() {
+            if (currentStep === 3) {
+                stopTimer();
+            }
+            
+            document.getElementById(`step${currentStep}`).classList.remove('active');
+            currentStep--;
+            document.getElementById(`step${currentStep}`).classList.add('active');
+            updateProgressDots();
+        }
+        
+        function startTimer() {
+            startTime = new Date();
+            timerInterval = setInterval(updateTimer, 1000);
+        }
+        
+        function stopTimer() {
+            if (timerInterval) {
+                clearInterval(timerInterval);
+            }
+        }
+        
+        function updateTimer() {
+            const now = new Date();
+            const elapsed = now - startTime;
+            
+            const hours = Math.floor(elapsed / (1000 * 60 * 60));
+            const minutes = Math.floor((elapsed % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((elapsed % (1000 * 60)) / 1000);
+            
+            const timeString = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            document.getElementById('timerDisplay').textContent = timeString;
+            trackingData.duration = timeString;
+        }
+        
+        function completeService() {
+            trackingData.outcome = 'completed';
+            stopTimer();
+            nextStep();
+        }
+        
+        function partialComplete() {
+            trackingData.outcome = 'partial';
+            stopTimer();
+            nextStep();
+        }
+        
+        function failedService() {
+            trackingData.outcome = 'failed';
+            stopTimer();
+            nextStep();
+        }
+        
+        function submitFeedback() {
+            // Collect final data
+            trackingData.comment = document.getElementById('quickComment').value;
+            
+            console.log('Feedback Data:', trackingData);
+            
+            // Show summary
+            showFeedbackSummary();
+            
+            // Move to thank you page
+            stopTimer();
+            nextStep();
+        }
+        
+        function showFeedbackSummary() {
+            const summary = document.getElementById('feedbackSummary');
+            const outcomeText = {
+                'completed': '✅ काम पूरा भयो',
+                'partial': '⚠️ आधा मात्र भयो', 
+                'failed': '❌ काम भएन'
+            };
+            
+            const moodText = {
+                'excellent': '😊 उत्कृष्ट',
+                'good': '🙂 राम्रो',
+                'okay': '😐 ठीकै',
+                'poor': '🙁 नराम्रो',
+                'terrible': '😞 खराब'
+            };
+            
+            const wardDisplay = trackingData.ward ? `, वडा नं. ${trackingData.ward}` : '';
+            const locationDisplay = `${trackingData.district}${wardDisplay}, ${trackingData.province}`;
+            
+            summary.innerHTML = `
+                <p><strong>ठाउँ:</strong> ${locationDisplay}</p>
+                <p><strong>कार्यालय:</strong> ${trackingData.officeType}</p>
+                <p><strong>सेवा:</strong> ${trackingData.service}</p>
+                <p><strong>समय:</strong> ${trackingData.duration}</p>
+                <p><strong>परिणाम:</strong> ${outcomeText[trackingData.outcome] || trackingData.outcome}</p>
+                <p><strong>मुड:</strong> ${moodText[trackingData.mood] || 'नछानिएको'}</p>
+                <p><strong>घुस:</strong> ${trackingData.bribeAsked === 'yes' ? '😠 माग्यो' : trackingData.bribeAsked === 'no' ? '😊 मागेन' : 'नछानिएको'}</p>
+                <p><strong>दलाल:</strong> ${trackingData.dalaalNeeded === 'yes' ? '😤 प्रयोग गर्नुपर्यो' : trackingData.dalaalNeeded === 'no' ? '👍 आवश्यक भएन' : 'नछानिएको'}</p>
+                <p><strong>अनावश्यक कागजात:</strong> ${trackingData.unnecessaryDocs === 'yes' ? '📄 धेरै फालतु' : trackingData.unnecessaryDocs === 'no' ? '✅ उचित मात्र' : 'नछानिएको'}</p>
+                <p><strong>फेरि डाटा भर्नुपर्यो:</strong> ${trackingData.redundantData === 'yes' ? '😑 फेरि भर्नुपर्यो' : trackingData.redundantData === 'no' ? '🚀 स्वतः भरिएको' : 'नछानिएको'}</p>
+                <p><strong>कर्मचारी व्यवहार:</strong> ${trackingData.staffRating ? '⭐'.repeat(trackingData.staffRating) : 'मूल्याङ्कन भएन'}</p>
+                <p><strong>प्रक्रिया सजिलो:</strong> ${trackingData.processRating ? '⭐'.repeat(trackingData.processRating) : 'मूल्याङ्कन भएन'}</p>
+                ${trackingData.comment ? `<p><strong>टिप्पणी:</strong> ${trackingData.comment}</p>` : ''}
+            `;
+        }
+        
+        function resetTracker() {
+            currentStep = 1;
+            trackingData = {
+                province: '',
+                district: '',
+                ward: '',
+                officeType: '',
+                service: '',
+                mood: '',
+                bribeAsked: '',
+                dalaalNeeded: '',
+                unnecessaryDocs: '',
+                redundantData: '',
+                staffRating: 0,
+                processRating: 0,
+                comment: '',
+                duration: '',
+                outcome: ''
+            };
+            
+            document.querySelectorAll('.step').forEach(step => step.classList.remove('active'));
+            document.getElementById('step1').classList.add('active');
+            document.querySelectorAll('.mood-option, .yes-no-btn').forEach(el => el.classList.remove('selected'));
+            document.querySelectorAll('.star').forEach(star => star.classList.remove('active'));
+            document.getElementById('quickComment').value = '';
+            document.getElementById('provinceSelect').value = '';
+            document.getElementById('districtSelect').value = '';
+            document.getElementById('districtSelect').disabled = true;
+            document.getElementById('wardSelect').value = '';
+            document.getElementById('wardGroup').style.display = 'none';
+            document.getElementById('officeTypeSelect').value = '';
+            document.getElementById('serviceSelect').value = '';
+            document.getElementById('step1Next').disabled = true;
+            document.getElementById('step2Next').disabled = true;
+            updateProgressDots();
+        }
+        
+        function showDetailedForm() {
+            alert('विस्तृत फारम छिट्टै आउनेछ! अहिलेलाई छिटो विकल्प प्रयोग गर्नुहोस्।');
+        }
+        
+        // Event Listeners
+        document.getElementById('provinceSelect').addEventListener('change', function() {
+            const province = this.value;
+            const districtSelect = document.getElementById('districtSelect');
+            const wardGroup = document.getElementById('wardGroup');
+            
+            trackingData.province = province;
+            
+            if (province) {
+                districtSelect.disabled = false;
+                districtSelect.innerHTML = '<option value="">जिल्ला छान्नुहोस्...</option>';
+                
+                districtsByProvince[province].forEach(district => {
+                    const option = document.createElement('option');
+                    option.value = district;
+                    option.textContent = district;
+                    districtSelect.appendChild(option);
+                });
+            } else {
+                districtSelect.disabled = true;
+                districtSelect.innerHTML = '<option value="">पहिले प्रदेश छान्नुहोस्...</option>';
+                wardGroup.style.display = 'none';
+            }
+            
+            checkStep1Complete();
+        });
+        
+        document.getElementById('districtSelect').addEventListener('change', function() {
+            const district = this.value;
+            const wardGroup = document.getElementById('wardGroup');
+            
+            trackingData.district = district;
+            
+            // Show ward selection for municipalities and some services
+            if (district) {
+                wardGroup.style.display = 'block';
+            } else {
+                wardGroup.style.display = 'none';
+            }
+            
+            checkStep1Complete();
+        });
+        
+        document.getElementById('wardSelect').addEventListener('change', function() {
+            trackingData.ward = this.value;
+            checkStep1Complete();
+        });
+        
+        document.getElementById('officeTypeSelect').addEventListener('change', function() {
+            trackingData.officeType = this.value;
+            updateServiceOptions(this.value);
+            checkStep2Complete();
+        });
+        
+        document.getElementById('serviceSelect').addEventListener('change', function() {
+            trackingData.service = this.value;
+            checkStep2Complete();
+        });
+        
+        function checkStep1Complete() {
+            const hasProvince = trackingData.province !== '';
+            const hasDistrict = trackingData.district !== '';
+            
+            document.getElementById('step1Next').disabled = !(hasProvince && hasDistrict);
+        }
+        
+        function checkStep2Complete() {
+            const hasOfficeType = trackingData.officeType !== '';
+            const hasService = trackingData.service !== '';
+            
+            document.getElementById('step2Next').disabled = !(hasOfficeType && hasService);
+        }
+        
+        document.getElementById('moodSelect').addEventListener('click', function(e) {
+            if (e.target.closest('.mood-option')) {
+                document.querySelectorAll('#moodSelect .mood-option').forEach(opt => opt.classList.remove('selected'));
+                e.target.closest('.mood-option').classList.add('selected');
+                trackingData.mood = e.target.closest('.mood-option').dataset.mood;
+            }
+        });
+        
+        // Question handlers for all yes/no questions
+        document.querySelectorAll('[data-bribe]').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('[data-bribe]').forEach(b => b.classList.remove('selected'));
+                this.classList.add('selected');
+                trackingData.bribeAsked = this.dataset.bribe;
+            });
+        });
+        
+        document.querySelectorAll('[data-dalaal]').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('[data-dalaal]').forEach(b => b.classList.remove('selected'));
+                this.classList.add('selected');
+                trackingData.dalaalNeeded = this.dataset.dalaal;
+            });
+        });
+        
+        document.querySelectorAll('[data-unnecessary]').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('[data-unnecessary]').forEach(b => b.classList.remove('selected'));
+                this.classList.add('selected');
+                trackingData.unnecessaryDocs = this.dataset.unnecessary;
+            });
+        });
+        
+        document.querySelectorAll('[data-redundant]').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('[data-redundant]').forEach(b => b.classList.remove('selected'));
+                this.classList.add('selected');
+                trackingData.redundantData = this.dataset.redundant;
+            });
+        });
+        
+        // Star rating functionality
+        document.querySelectorAll('.star-rating').forEach(ratingGroup => {
+            const stars = ratingGroup.querySelectorAll('.star');
+            const ratingType = ratingGroup.dataset.rating;
+            
+            stars.forEach(star => {
+                star.addEventListener('click', function() {
+                    const value = parseInt(this.dataset.value);
+                    
+                    // Update tracking data based on rating type
+                    if (ratingType === 'staff') {
+                        trackingData.staffRating = value;
+                    } else if (ratingType === 'process') {
+                        trackingData.processRating = value;
+                    }
+                    
+                    // Update visual state
+                    stars.forEach((s, index) => {
+                        if (index < value) {
+                            s.classList.add('active');
+                        } else {
+                            s.classList.remove('active');
+                        }
+                    });
+                });
+            });
+        });
+        
+        // Initialize
+        updateProgressDots();
+    </script>
+    
+    <!-- Database Integration -->
+    <script src="office-tracker-db.js"></script>
+    
+    <script>
+        // Initialize database and enhance form submission
+        document.addEventListener('DOMContentLoaded', function() {
+            // Track start time for analytics
+            window.trackerStartTime = Date.now();
+            
+            // Override the existing submitFeedback function
+            window.originalSubmitFeedback = window.submitFeedback;
+            
+            window.submitFeedback = async function() {
+                console.log('🏛️ Enhanced submitFeedback called with database integration');
+                
+                try {
+                    // Validate form data
+                    const validation = window.officeDB.validateSubmission(trackingData);
+                    if (!validation.isValid) {
+                        alert('कृपया सबै आवश्यक जानकारी भर्नुहोस्:\n' + validation.errors.join('\n'));
+                        return;
+                    }
+                    
+                    // Show loading state
+                    const submitButtons = document.querySelectorAll('button[onclick="submitFeedback()"]');
+                    submitButtons.forEach(btn => {
+                        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> सबमिट गर्दै...';
+                        btn.disabled = true;
+                    });
+                    
+                    // Submit to database
+                    console.log('📊 Submitting tracking data:', trackingData);
+                    const result = await window.officeDB.submitOfficeExperience(trackingData);
+                    
+                    if (result.success) {
+                        console.log('✅ Database submission successful:', result.id);
+                        
+                        // Show success message and hide form
+                        showSubmissionSuccess(result.id);
+                        document.querySelector('.container').style.display = 'none';
+                    } else {
+                        throw new Error(result.error || 'Database submission failed');
+                    }
+                    
+                } catch (error) {
+                    console.error('❌ Enhanced submission error:', error);
+                    alert('अस्थायी समस्या छ। कृपया फेरि प्रयास गर्नुहोस्।\n\nTechnical: ' + error.message);
+                    
+                    // Restore button state
+                    const submitButtons = document.querySelectorAll('button[onclick="submitFeedback()"]');
+                    submitButtons.forEach(btn => {
+                        btn.innerHTML = '<i class="fas fa-paper-plane"></i> पठाउनुहोस्';
+                        btn.disabled = false;
+                    });
+                }
+            };
+            
+            console.log('🏛️ Office Tracker Database Integration Ready');
+        });
+    </script>
+</body>
+</html>

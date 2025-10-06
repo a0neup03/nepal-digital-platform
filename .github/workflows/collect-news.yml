@@ -1,0 +1,145 @@
+name: Automated News Collection
+
+# Schedule: 3 times daily at Nepal Time (UTC+5:45)
+# 6:00 AM Nepal = 00:15 UTC
+# 12:00 PM Nepal = 06:15 UTC
+# 6:00 PM Nepal = 12:15 UTC
+on:
+  schedule:
+    - cron: '15 0 * * *'   # 6:00 AM Nepal Time (Morning)
+    - cron: '15 6 * * *'   # 12:00 PM Nepal Time (Midday)
+    - cron: '15 12 * * *'  # 6:00 PM Nepal Time (Evening)
+
+  # Allow manual trigger from GitHub UI
+  workflow_dispatch:
+    inputs:
+      limit:
+        description: 'Number of articles to collect'
+        required: false
+        default: '100'
+
+jobs:
+  collect-news:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        # Fetch full history for proper git commits
+        fetch-depth: 0
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.9'
+        cache: 'pip'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+      working-directory: news_aggregator
+
+    - name: Run news collection
+      env:
+        LIMIT: ${{ github.event.inputs.limit || '100' }}
+      run: |
+        echo "🇳🇵 Starting Nepal News Collection"
+        echo "Time: $(date)"
+        echo "Limit: $LIMIT articles"
+
+        # Run collection
+        python comprehensive_rss_collector.py --limit $LIMIT
+
+        echo "✅ Collection completed"
+      working-directory: news_aggregator
+
+    - name: Database health check
+      run: |
+        echo "📊 Database Health Check"
+
+        # Check database exists
+        if [ ! -f nepal_news_intelligence.db ]; then
+          echo "❌ ERROR: Database not found!"
+          exit 1
+        fi
+
+        # Get statistics
+        DB_SIZE=$(du -h nepal_news_intelligence.db | cut -f1)
+        TOTAL_ARTICLES=$(sqlite3 nepal_news_intelligence.db \
+          "SELECT COUNT(*) FROM articles_enhanced" 2>/dev/null || echo "0")
+        DISTINCT_SOURCES=$(sqlite3 nepal_news_intelligence.db \
+          "SELECT COUNT(DISTINCT source_site) FROM articles_enhanced" 2>/dev/null || echo "0")
+        NEW_ARTICLES=$(sqlite3 nepal_news_intelligence.db \
+          "SELECT COUNT(*) FROM articles_enhanced WHERE scraped_date >= datetime('now', '-1 hour')" 2>/dev/null || echo "0")
+
+        echo "Database size: $DB_SIZE"
+        echo "Total articles: $TOTAL_ARTICLES"
+        echo "Active sources: $DISTINCT_SOURCES"
+        echo "New articles (last hour): $NEW_ARTICLES"
+
+        # Warning if no new articles
+        if [ "$NEW_ARTICLES" -eq 0 ]; then
+          echo "⚠️ WARNING: No new articles collected!"
+        fi
+      working-directory: news_aggregator
+
+    - name: Commit and push changes
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+
+        # Add database changes
+        git add news_aggregator/nepal_news_intelligence.db
+
+        # Check if there are changes to commit
+        if git diff --staged --quiet; then
+          echo "No changes to commit"
+        else
+          # Create commit message with stats
+          TIMESTAMP=$(date -u +"%Y-%m-%d %H:%M UTC")
+          NEW_COUNT=$(sqlite3 news_aggregator/nepal_news_intelligence.db \
+            "SELECT COUNT(*) FROM articles_enhanced WHERE scraped_date >= datetime('now', '-1 hour')" 2>/dev/null || echo "0")
+
+          git commit -m "🤖 Automated news collection - $TIMESTAMP
+
+Collected $NEW_COUNT new articles
+
+🤖 Generated with GitHub Actions
+Co-Authored-By: Nepal News Bot <action@github.com>"
+
+          git push
+          echo "✅ Database changes pushed to repository"
+        fi
+
+    - name: Generate collection report
+      if: always()
+      run: |
+        echo "## 📰 Collection Report" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "**Time:** $(date)" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+
+        if [ -f nepal_news_intelligence.db ]; then
+          TOTAL=$(sqlite3 nepal_news_intelligence.db \
+            "SELECT COUNT(*) FROM articles_enhanced" 2>/dev/null || echo "0")
+          SOURCES=$(sqlite3 nepal_news_intelligence.db \
+            "SELECT COUNT(DISTINCT source_site) FROM articles_enhanced" 2>/dev/null || echo "0")
+          NEW=$(sqlite3 nepal_news_intelligence.db \
+            "SELECT COUNT(*) FROM articles_enhanced WHERE scraped_date >= datetime('now', '-1 hour')" 2>/dev/null || echo "0")
+
+          echo "**Total Articles:** $TOTAL" >> $GITHUB_STEP_SUMMARY
+          echo "**Active Sources:** $SOURCES" >> $GITHUB_STEP_SUMMARY
+          echo "**New Articles:** $NEW" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if [ "$NEW" -eq 0 ]; then
+            echo "⚠️ **Warning:** No new articles collected" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "✅ **Status:** Collection successful" >> $GITHUB_STEP_SUMMARY
+          fi
+        else
+          echo "❌ **Error:** Database not found" >> $GITHUB_STEP_SUMMARY
+        fi
+      working-directory: news_aggregator
