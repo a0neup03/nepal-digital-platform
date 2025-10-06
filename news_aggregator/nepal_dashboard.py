@@ -1626,7 +1626,7 @@ def main():
                 </div>
                 """, unsafe_allow_html=True)
 
-                # Top 3 as large hero cards (Apple News style)
+                # Top 3 as large hero cards - Using Streamlit native components for compatibility
                 for i, story in enumerate(timeline_stories[:3], 1):
                     article_url = story.get('articles', [{}])[0].get('url', '#') if story.get('articles') else '#'
                     full_title = story['title']
@@ -1634,45 +1634,25 @@ def main():
                     source_count = story.get('source_count', 0)
                     first_article = story.get('articles', [{}])[0] if story.get('articles') else {}
                     source_name = first_article.get('source_site', 'Unknown').replace('_', ' ').title()
-                    published_time = first_article.get('published_date', '')[:16] if first_article.get('published_date') else ''
+                    published_time = first_article.get('published_date', '')[:10] if first_article.get('published_date') else ''
 
-                    # Clean card with Apple aesthetics
-                    st.markdown(f"""
-                    <a href="{article_url if article_url != '#' else 'javascript:void(0)'}" target="_blank" style="text-decoration: none; color: inherit;">
-                        <div style="
-                            background: white;
-                            border-radius: 12px;
-                            padding: 1.75rem;
-                            margin-bottom: 1.25rem;
-                            border: 1px solid #e5e5e7;
-                            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-                            cursor: pointer;
-                        " onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 12px 24px rgba(0,0,0,0.08)'; this.style.borderColor='#d2d2d7';"
-                           onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'; this.style.borderColor='#e5e5e7';">
+                    # Apple-style card using Streamlit container
+                    with st.container():
+                        # Metadata row
+                        meta_col1, meta_col2 = st.columns([3, 1])
+                        with meta_col1:
+                            st.caption(f"**{source_name}** • {published_time}")
+                        with meta_col2:
+                            st.caption(f"📊 {article_count} articles")
 
-                            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem;">
-                                <span style="font-size: 0.8rem; color: #86868b; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em;">{source_name}</span>
-                                <span style="color: #d2d2d7;">•</span>
-                                <span style="font-size: 0.8rem; color: #86868b;">{published_time}</span>
-                                <span style="margin-left: auto; background: #f5f5f7; padding: 0.25rem 0.75rem; border-radius: 12px; font-size: 0.75rem; color: #1d1d1f; font-weight: 500;">{article_count} sources</span>
-                            </div>
+                        # Title (large and prominent)
+                        st.markdown(f"### {full_title}")
 
-                            <h3 style="
-                                font-size: 1.5rem;
-                                font-weight: 600;
-                                color: #1d1d1f;
-                                line-height: 1.3;
-                                margin: 0;
-                                letter-spacing: -0.01em;
-                            ">{full_title}</h3>
+                        # Read more link
+                        if article_url and article_url != '#':
+                            st.markdown(f"[🔗 Read full story →]({article_url})")
 
-                            <div style="margin-top: 0.75rem; display: flex; align-items: center; gap: 0.5rem; color: #0071e3;">
-                                <span style="font-size: 0.9rem; font-weight: 500;">Read more</span>
-                                <span style="font-size: 1rem;">→</span>
-                            </div>
-                        </div>
-                    </a>
-                    """, unsafe_allow_html=True)
+                        st.markdown("---")
 
                 # Remaining stories as clean compact list
                 if len(timeline_stories) > 3:
@@ -1723,283 +1703,50 @@ def main():
                 else:
                     st.info("No timeline data available for selected period")
 
-            # Fallback section if no trending stories (outside the main if block)
-            if not timeline_stories or len(timeline_stories) == 0:
-                # Instead of empty message, show recent activity overview
-                st.markdown("### 🔥 Trending Leaders & Topics (Last 24H)")
+            # Fallback section if no trending stories - Show recent articles instead
+            else:
+                st.markdown("### 📰 Recent Articles")
+                st.caption("No trending clusters found. Showing latest individual articles instead.")
 
                 try:
                     conn = sqlite3.connect('nepal_news_intelligence.db')
-                    # Search for leader names and trending topics with available scores and URLs
-                    trending_df = pd.read_sql_query("""
-                        SELECT title, content, published_date, source_site, url,
-                               quality_score, sentiment_score, emotion
+                    # Get recent articles directly (simple query, no complex topic detection)
+                    recent_df = pd.read_sql_query("""
+                        SELECT title, published_date, source_site, url
                         FROM articles_enhanced
                         WHERE COALESCE(published_date, scraped_date) >= datetime('now', '-24 hours')
-                        AND (title IS NOT NULL OR content IS NOT NULL)
+                        AND title IS NOT NULL
+                        AND LENGTH(title) > 10
                         ORDER BY published_date DESC
-                        LIMIT 1000
+                        LIMIT 20
                     """, conn)
                     conn.close()
 
-                    if not trending_df.empty:
-                        # Enhanced topic detection with weighted scoring
-                        import re
+                    if not recent_df.empty:
+                        # Show recent articles as simple clean list (Apple style)
+                        for idx, row in recent_df.iterrows():
+                            title = row['title']
+                            source = row['source_site'].replace('_', ' ').title()
+                            date_str = row['published_date'][:10] if row['published_date'] else ''
+                            url = row.get('url', '#')
 
-                        leaders_topics = {
-                            '🏛️ KP Sharma Oli': {
-                                'primary': ['ओली', 'kp sharma oli', 'केपी शर्मा ओली'],
-                                'secondary': ['oli', 'kp oli', 'prime minister oli'],
-                                'weight': 3
-                            },
-                            '🏛️ Sher Bahadur Deuba': {
-                                'primary': ['देउवा', 'sher bahadur deuba', 'शेर बहादुर देउवा'],
-                                'secondary': ['deuba', 'sher bahadur', 'congress president'],
-                                'weight': 3
-                            },
-                            '🏛️ Pushpa Kamal Dahal': {
-                                'primary': ['प्रचण्ड', 'prachanda', 'pushpa kamal dahal'],
-                                'secondary': ['dahal', 'maoist center', 'माओवादी केन्द्र'],
-                                'weight': 3
-                            },
-                            '🏛️ Rabi Lamichhane': {
-                                'primary': ['रवि लामिछाने', 'rabi lamichhane', 'ravi lamichhane'],
-                                'secondary': ['lamichhane', 'rsf', 'rastriya swatantra'],
-                                'weight': 2.5
-                            },
-                            '💰 Budget 2025': {
-                                'primary': ['बजेट', 'budget 2025', 'आर्थिक बजेट'],
-                                'secondary': ['budget', 'fiscal year', 'financial policy'],
-                                'weight': 2
-                            },
-                            '🗳️ Election Commission': {
-                                'primary': ['निर्वाचन आयोग', 'election commission', 'निर्वाचन'],
-                                'secondary': ['election', 'commission', 'electoral'],
-                                'weight': 2
-                            },
-                            '⚖️ Corruption Cases': {
-                                'primary': ['भ्रष्टाचार', 'corruption case', 'अख्तियार'],
-                                'secondary': ['corruption', 'scam', 'ciaa', 'fraud'],
-                                'weight': 2.5
-                            },
-                            '📊 Economic Policy': {
-                                'primary': ['अर्थतन्त्र', 'economic policy', 'आर्थिक नीति'],
-                                'secondary': ['economy', 'economic', 'inflation', 'gdp'],
-                                'weight': 1.5
-                            }
-                        }
-
-                        trending_scores = {}
-                        article_mapping = {}  # Track which articles mention each topic
-
-                        for _, article in trending_df.iterrows():
-                            text = f"{article.get('title', '')} {article.get('content', '')}".lower()
-
-                            for topic, config in leaders_topics.items():
-                                score = 0
-
-                                # Check primary terms (higher weight)
-                                for term in config['primary']:
-                                    pattern = r'\b' + re.escape(term.lower()) + r'\b'
-                                    matches = len(re.findall(pattern, text))
-                                    score += matches * config['weight'] * 2
-
-                                # Check secondary terms (lower weight)
-                                for term in config['secondary']:
-                                    pattern = r'\b' + re.escape(term.lower()) + r'\b'
-                                    matches = len(re.findall(pattern, text))
-                                    score += matches * config['weight']
-
-                                if score > 0:
-                                    trending_scores[topic] = trending_scores.get(topic, 0) + score
-                                    if topic not in article_mapping:
-                                        article_mapping[topic] = []
-                                    article_mapping[topic].append(article)
-
-                        # Show top trending with horizontal bar chart
-                        if trending_scores:
-                            sorted_trending = sorted(trending_scores.items(), key=lambda x: x[1], reverse=True)[:5]
-
-                            # Create horizontal bar chart for trending scores
-                            topics = [item[0] for item in sorted_trending]
-                            scores = [item[1] for item in sorted_trending]
-                            article_counts = [len(article_mapping.get(topic, [])) for topic in topics]
-
-                            # Create the plot
-                            fig_trending = go.Figure()
-
-                            # Add horizontal bars with attractive, accessible colors
-                            fig_trending.add_trace(go.Bar(
-                                y=topics,
-                                x=scores,
-                                orientation='h',
-                                marker=dict(
-                                    color=scores,
-                                    colorscale='viridis',  # Colorblind-friendly scale
-                                    showscale=True,
-                                    colorbar=dict(title="Trending Score")
-                                ),
-                                text=[f"{score:.1f} ({count} articles)" for score, count in zip(scores, article_counts)],
-                                textposition='inside',
-                                textfont=dict(color='white', size=10),
-                                hovertemplate='<b>%{y}</b><br>Score: %{x:.1f}<br>Articles: %{customdata}<extra></extra>',
-                                customdata=article_counts
-                            ))
-
-                            fig_trending.update_layout(
-                                title={
-                                    'text': "📊 Trending Score Analysis",
-                                    'x': 0.5,
-                                    'xanchor': 'center'
-                                },
-                                xaxis_title="Trending Score",
-                                yaxis_title="Topics & Leaders",
-                                height=300,
-                                margin=dict(l=10, r=10, t=50, b=10),
-                                showlegend=False,
-                                font=dict(size=10)
-                            )
-
-                            # Create better side-by-side layout for visualization and details
-                            col1, col2 = st.columns([3, 2])
-
-                            with col1:
-                                st.plotly_chart(fig_trending, use_container_width=True)
-
-                            with col2:
-                                st.markdown("#### 📈 Quick Stats")
-                                st.info(f"**{len(sorted_trending)}** trending topics detected\n\n**{sum(len(article_mapping.get(topic, [])) for topic, _ in sorted_trending)}** total articles analyzed")
-
-                            # Link to technical details (moved to separate section)
-                            st.markdown("📖 [View Technical Methodology](#technical-details) for detailed scoring calculation")
-
-                            # Expandable article details
-                            st.markdown("### 📰 Article Details")
-                            for i, (topic, score) in enumerate(sorted_trending, 1):
-                                relevance_count = len(article_mapping.get(topic, []))
-                                with st.expander(f"#{i}. {topic} - {relevance_count} articles", expanded=False):
-                                    # Use pre-mapped articles for this topic
-                                    topic_articles = article_mapping.get(topic, [])
-
-                                    # Show relevant articles with enhanced accessibility
-                                    if topic_articles:
-                                        for j, article in enumerate(topic_articles[:3], 1):  # Show top 3 articles
-                                            title = article.get('title', 'No title')
-                                            source = article.get('source_site', 'Unknown')
-                                            url = article.get('url', '')
-                                            date = article.get('published_date', '')[:16] if article.get('published_date') else ''
-
-                                            # Create expandable article section
-                                            with st.expander(f"📰 {title[:180]}..." if len(title) > 180 else f"📰 {title}", expanded=False):
-                                                # Article metadata
-                                                col1, col2 = st.columns([3, 1])
-                                                with col1:
-                                                    st.markdown(f"**Source:** {source.replace('_', ' ').title()}")
-                                                    st.markdown(f"**Date:** {date}")
-                                                with col2:
-                                                    if url:
-                                                        st.markdown(f"[🔗 Read Original]({url})")
-
-                                                # Full content
-                                                content = article.get('content', '')
-                                                if content:
-                                                    if len(content) > 500:
-                                                        # Show first 300 chars with option to see more
-                                                        st.markdown("**Content Preview:**")
-                                                        st.text_area("Article Preview", content[:300] + "...", height=100, disabled=True, key=f"content_{j}_{topic}", label_visibility="collapsed")
-
-                                                        # Full content in expander
-                                                        with st.expander("📖 Read Full Article"):
-                                                            st.text_area("Full Article Content", content, height=200, disabled=True, key=f"full_content_{j}_{topic}", label_visibility="collapsed")
-                                                    else:
-                                                        st.markdown("**Content:**")
-                                                        st.text_area("Article Content", content, height=100, disabled=True, key=f"short_content_{j}_{topic}", label_visibility="collapsed")
-
-                                                    # Enhanced analytics metrics (using available database columns)
-                                                    quality_score = article.get('quality_score', 'N/A')
-                                                    sentiment = article.get('sentiment_score', 'N/A')
-                                                    emotion = article.get('emotion', 'N/A')
-
-                                                    metrics_col1, metrics_col2, metrics_col3 = st.columns(3)
-                                                    with metrics_col1:
-                                                        if quality_score != 'N/A' and quality_score is not None:
-                                                            quality_display = f"{quality_score:.2f}" if isinstance(quality_score, float) else str(quality_score)
-                                                            # Color coding for quality: green=high, orange=medium, red=low
-                                                            try:
-                                                                quality_val = float(quality_display)
-                                                                color = "🟢" if quality_val > 0.7 else "🟡" if quality_val > 0.4 else "🔴"
-                                                                st.metric(f"⭐ Quality {color}", quality_display)
-                                                            except:
-                                                                st.metric("⭐ Quality", quality_display)
-                                                        else:
-                                                            st.metric("⭐ Quality", "N/A")
-                                                    with metrics_col2:
-                                                        if sentiment != 'N/A' and sentiment is not None:
-                                                            sentiment_display = f"{sentiment:.2f}" if isinstance(sentiment, float) else str(sentiment)
-                                                            # Color coding for sentiment: green=positive, red=negative, gray=neutral
-                                                            try:
-                                                                sentiment_val = float(sentiment_display)
-                                                                emoji = "😊" if sentiment_val > 0.2 else "😐" if sentiment_val > -0.2 else "😞"
-                                                                st.metric(f"{emoji} Sentiment", sentiment_display)
-                                                            except:
-                                                                st.metric("😊 Sentiment", sentiment_display)
-                                                        else:
-                                                            st.metric("😊 Sentiment", "N/A")
-                                                    with metrics_col3:
-                                                        if emotion != 'N/A' and emotion:
-                                                            # Add emoji for emotions
-                                                            emotion_emoji = {
-                                                                'joy': '😄', 'happy': '😊', 'positive': '😊',
-                                                                'anger': '😠', 'angry': '😡', 'negative': '😞',
-                                                                'sadness': '😢', 'sad': '😢', 'fear': '😨',
-                                                                'neutral': '😐', 'surprise': '😲', 'disgust': '🤢'
-                                                            }
-                                                            emotion_text = str(emotion).lower()
-                                                            emoji = next((v for k, v in emotion_emoji.items() if k in emotion_text), '🎭')
-                                                            st.metric(f"{emoji} Emotion", emotion.title())
-                                                        else:
-                                                            st.metric("🎭 Emotion", "N/A")
-                                                else:
-                                                    st.info("No content available for this article")
-
-                                            st.markdown("---")
-                                    else:
-                                        st.info("No specific articles found for this topic")
-                        else:
-                            st.info("No trending topics detected in recent articles")
+                            # Clean article card
+                            st.markdown(f"""
+                            <div style="padding: 1rem 0; border-bottom: 1px solid #f5f5f7;">
+                                <div style="color: #86868b; font-size: 0.75rem; margin-bottom: 0.25rem;">
+                                    {source} • {date_str}
+                                </div>
+                                <div style="font-size: 1.05rem; font-weight: 500; color: #1d1d1f; margin-bottom: 0.5rem;">
+                                    {title}
+                                </div>
+                                {'<a href="' + url + '" target="_blank" style="color: #0071e3; text-decoration: none; font-size: 0.9rem;">Read article →</a>' if url and url != '#' else ''}
+                            </div>
+                            """, unsafe_allow_html=True)
                     else:
-                        st.info("No recent articles in the last 24 hours")
+                        st.info("No recent articles available")
 
                 except Exception as e:
-                    st.warning(f"Unable to load recent activity data: {e}")
-                    # Fallback: show recent articles without topic filtering
-                    try:
-                        fallback_query = """
-                        SELECT title, source_site, published_date, url
-                        FROM articles_enhanced
-                        WHERE COALESCE(published_date, scraped_date) >= datetime('now', '-24 hours')
-                        ORDER BY published_date DESC
-                        LIMIT 5
-                        """
-                        fallback_df = pd.read_sql_query(fallback_query, conn)
-                        if not fallback_df.empty:
-                            st.markdown("### 📰 Recent Articles (Last 24H)")
-                            for _, article in fallback_df.iterrows():
-                                title = article.get('title', 'No title')
-                                source = article.get('source_site', 'Unknown').replace('_', ' ').title()
-                                url = article.get('url', '')
-                                date = article.get('published_date', '')[:16] if article.get('published_date') else ''
-
-                                with st.expander(f"📰 {title[:180]}..." if len(title) > 180 else f"📰 {title}", expanded=False):
-                                    col1, col2 = st.columns([3, 1])
-                                    with col1:
-                                        st.markdown(f"**Source:** {source}")
-                                        st.markdown(f"**Date:** {date}")
-                                    with col2:
-                                        if url:
-                                            st.markdown(f"[🔗 Read Original]({url})")
-                    except Exception as fallback_error:
-                        st.error(f"Database connection issue: {fallback_error}")
+                    st.warning(f"Unable to load recent articles: {e}")
 
             # End of main_col content - Apple-style clean layout complete
 
