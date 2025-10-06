@@ -1594,7 +1594,7 @@ def main():
         main_col, viz_col = st.columns([3, 2])
 
         with main_col:
-            # Radio buttons for easier time selection
+            # Radio buttons for time selection at top
             st.write("**⏰ Timeline View:**")
             selected_time_bin = st.radio(
                 "",
@@ -1612,7 +1612,56 @@ def main():
             # Regenerate stories for timeline view with caching
             timeline_stories = get_cached_trending_stories(timeline_hours)
 
-            # Story timeline plot (main visualization)
+            # ===== TRENDING STORIES LIST FIRST (AT TOP) =====
+            st.markdown("---")
+            st.markdown("### 🔥 Trending Topics")
+
+            if timeline_stories:
+                # Show trending stories in clean expandable cards
+                for i, story in enumerate(timeline_stories[:20], 1):  # Show top 20 stories
+                    article_url = story.get('articles', [{}])[0].get('url', '#') if story.get('articles') else '#'
+                    full_title = story['title']
+                    article_count = story.get('article_count', 0)
+                    source_count = story.get('source_count', 0)
+                    velocity = story.get('velocity', 0)
+                    story_articles = story.get('articles', [])
+
+                    # Trending intensity indicators
+                    fire_intensity = "🔥🔥🔥🔥🔥" if article_count >= 5 else "🔥🔥🔥🔥" if article_count >= 4 else "🔥🔥🔥" if article_count >= 3 else "🔥🔥" if article_count >= 2 else "🔥"
+                    velocity_emoji = "🚀" if velocity > 2 else "⚡" if velocity > 1 else "📈"
+
+                    # Compact card design
+                    with st.expander(f"{i}. {full_title}", expanded=(i <= 5)):  # First 5 expanded
+                        st.markdown(f"""
+                        🔥 **Trending:** {fire_intensity} ({article_count} articles)
+                        {velocity_emoji} **Velocity:** {velocity:.1f} articles/hour
+                        📡 **Sources:** {source_count} news outlets
+                        📰 **Topic Coverage:** Multi-source story
+                        """)
+
+                        if len(story_articles) > 0:
+                            st.markdown("**📋 Related Articles:**")
+                            for j, article in enumerate(story_articles[:5], 1):
+                                article_title = article.get('title', 'No title')
+                                article_source = article.get('source_site', 'Unknown').replace('_', ' ').title()
+                                article_url_item = article.get('url', '')
+
+                                if article_url_item and str(article_url_item).startswith('http'):
+                                    st.markdown(f"   {j}. [{article_title[:100]}...]({article_url_item}) - *{article_source}*")
+                                else:
+                                    st.markdown(f"   {j}. {article_title[:100]}... - *{article_source}*")
+
+                            if len(story_articles) > 5:
+                                st.markdown(f"   *...and {len(story_articles) - 5} more articles*")
+
+                            # Main article link
+                            if article_url and str(article_url).startswith('http'):
+                                st.markdown(f"🔗 [**Read Main Article**]({article_url})")
+
+            # ===== STORY TIMELINE VISUALIZATION BELOW =====
+            st.markdown("---")
+            st.markdown("### 📊 Story Timeline Visualization")
+
             if timeline_stories:
                 timeline_fig = create_story_timeline(timeline_stories, selected_time_bin)
                 if timeline_fig:
@@ -1894,177 +1943,68 @@ def main():
                     except Exception as fallback_error:
                         st.error(f"Database connection issue: {fallback_error}")
 
-            # Now show trending stories list in center column
+            # Optional: Show Popular Stories section at bottom of main column
             st.markdown("---")
-            st.markdown("### 🔥 Trending Topics")
+            st.markdown("### 📈 Popular Stories (High Quality)")
 
-            # Create tabs for different story types
-            story_tab1, story_tab2 = st.tabs(["🔥 Trending", "📈 Popular"])
+            # Get popular stories based on quality, word count, and recency
+            @st.cache_data(ttl=300)
+            def get_popular_stories(hours_back: int):
+                try:
+                    conn = sqlite3.connect('nepal_news_intelligence.db')
+                    cutoff_time = datetime.now() - timedelta(hours=hours_back)
 
-            with story_tab1:
-                st.markdown("### 🔥 Trending Stories")
+                    popular_query = """
+                        SELECT title, content, source_site, published_date, url,
+                               quality_score, sentiment_score, word_count, emotion
+                        FROM articles_enhanced
+                        WHERE COALESCE(published_date, scraped_date) >= ?
+                        AND title IS NOT NULL
+                        AND LENGTH(title) > 10
+                        AND quality_score IS NOT NULL
+                        ORDER BY quality_score DESC, word_count DESC, published_date DESC
+                        LIMIT 15
+                    """
 
-                # Show trending stories first, then supplement with recent stories if needed
-                display_count = 0
+                    popular_df = pd.read_sql_query(popular_query, conn, params=[cutoff_time.isoformat()])
+                    conn.close()
+                    return popular_df
 
-                if timeline_stories:
-                    st.markdown("### 🔥 Trending Topics")
+                except Exception as e:
+                    st.error(f"Error loading popular stories: {e}")
+                    return pd.DataFrame()
 
-                    # Clean style matching Popular section
-                    for i, story in enumerate(timeline_stories[:15], 1):
-                        display_count += 1
-                        article_url = story.get('articles', [{}])[0].get('url', '#') if story.get('articles') else '#'
-                        full_title = story['title']
-                        article_count = story.get('article_count', 0)
-                        source_count = story.get('source_count', 0)
-                        velocity = story.get('velocity', 0)
-                        story_articles = story.get('articles', [])
+            popular_stories = get_popular_stories(timeline_hours)
 
-                        # Trending intensity indicators (matching Popular's star system)
-                        fire_intensity = "🔥🔥🔥🔥🔥" if article_count >= 5 else "🔥🔥🔥🔥" if article_count >= 4 else "🔥🔥🔥" if article_count >= 3 else "🔥🔥" if article_count >= 2 else "🔥"
-                        velocity_emoji = "🚀" if velocity > 2 else "⚡" if velocity > 1 else "📈"
+            if not popular_stories.empty:
+                for i, (_, story) in enumerate(popular_stories.iterrows(), 1):
+                    title = story['title']
+                    source = story['source_site'].replace('_', ' ').title()
+                    url = story.get('url', '#')
+                    quality = story.get('quality_score', 0)
+                    word_count = story.get('word_count', 0)
+                    sentiment = story.get('sentiment_score', 0) or 0
 
-                        # Clean expandable design like Popular
-                        with st.expander(f"{i}. {full_title}", expanded=False):
-                            st.markdown(f"""
-                            🔥 **Trending:** {fire_intensity} ({article_count} articles)
-                            {velocity_emoji} **Velocity:** {velocity:.1f} articles/hour
-                            📡 **Sources:** {source_count} news outlets
-                            📰 **Topic Coverage:** Multi-source story
-                            """)
+                    # Quality and sentiment indicators
+                    quality_stars = "⭐" * min(int(quality * 5), 5)
+                    sentiment_emoji = "📈" if sentiment > 0.1 else "📉" if sentiment < -0.1 else "📊"
 
-                            if len(story_articles) > 0:
-                                st.markdown("**📋 Related Articles:**")
-                                for j, article in enumerate(story_articles[:5], 1):  # Show first 5 like Popular
-                                    article_title = article.get('title', 'No title')
-                                    article_source = article.get('source_site', 'Unknown').replace('_', ' ').title()
-                                    article_url_item = article.get('url', '')
+                    with st.expander(f"{i}. {title}", expanded=False):
+                        st.markdown(f"""
+                        🏆 **Quality:** {quality_stars} ({quality:.2f})
+                        {sentiment_emoji} **Sentiment:** {sentiment:.2f}
+                        📝 **Length:** {word_count} words
+                        📰 **Source:** {source}
 
-                                    if article_url_item and str(article_url_item).startswith('http'):
-                                        st.markdown(f"   {j}. [{article_title[:100]}...]({article_url_item}) - *{article_source}*")
-                                    else:
-                                        st.markdown(f"   {j}. {article_title[:100]}... - *{article_source}*")
+                        🔗 [Read Article]({url})
+                        """)
+            else:
+                st.info("No popular stories available for this time period")
 
-                                if len(story_articles) > 5:
-                                    st.markdown(f"   *...and {len(story_articles) - 5} more articles*")
-
-                                # Main article link
-                                if article_url and str(article_url).startswith('http'):
-                                    st.markdown(f"🔗 [**Read Main Article**]({article_url})")
-                else:
-                    # Fallback: Show recent top stories from database
-                    try:
-                        conn = sqlite3.connect('nepal_news_intelligence.db')
-                        recent_stories = pd.read_sql_query("""
-                            SELECT title, source_site, published_date, word_count, sentiment_score, url
-                            FROM articles_enhanced
-                            WHERE title IS NOT NULL AND LENGTH(title) > 10
-                            ORDER BY published_date DESC
-                            LIMIT 15
-                        """, conn)
-                        conn.close()
-
-                        if not recent_stories.empty:
-                            for i, (_, story) in enumerate(recent_stories.iterrows(), 1):
-                                sentiment_emoji = "📈" if story['sentiment_score'] > 0 else "📉" if story['sentiment_score'] < 0 else "📊"
-
-                                # Show full title with expandable details
-                                story_url = story.get('url', '')
-                                full_title = story["title"]
-
-                                with st.expander(f"{i}. {full_title}", expanded=False):
-                                    st.markdown(f"""
-                                    📍 **Source:** {story['source_site']}
-                                    🕒 **Published:** {story['published_date']}
-                                    📊 **Sentiment:** {sentiment_emoji} {story['sentiment_score']:.2f}
-                                    📝 **Length:** {story['word_count']} words
-                                    """)
-
-                                    if story_url and str(story_url).startswith('http'):
-                                        st.markdown(f"🔗 [Read Full Article]({story_url})")
-                        else:
-                            st.info("No recent stories available")
-
-                    except Exception as e:
-                        st.warning(f"Unable to load recent stories: {e}")
-
-                        # Final fallback: Show sample stories
-                        sample_stories = [
-                            "नेपाली राजनीतिमा नयाँ विकास",
-                            "अर्थतन्त्रमा सुधारका संकेत",
-                            "शिक्षा क्षेत्रमा नवाचार",
-                            "पर्यटन उद्योगको वृद्धि",
-                            "कृषि नीतिमा परिवर्तन"
-                        ]
-
-                        for i, title in enumerate(sample_stories, 1):
-                            st.markdown(f"""
-                            <div class="trending-story">
-                                <strong>{i}. {title}</strong><br>
-                                <small>Sample • 📊 Recent</small>
-                            </div>
-                            """, unsafe_allow_html=True)
-
-            with story_tab2:
-                st.markdown("### 📈 Popular Stories")
-
-                # Get popular stories based on quality, word count, and recency
-                @st.cache_data(ttl=300)
-                def get_popular_stories(hours_back: int):
-                    try:
-                        conn = sqlite3.connect('nepal_news_intelligence.db')
-                        cutoff_time = datetime.now() - timedelta(hours=hours_back)
-
-                        popular_query = """
-                            SELECT title, content, source_site, published_date, url,
-                                   quality_score, sentiment_score, word_count, emotion
-                            FROM articles_enhanced
-                            WHERE COALESCE(published_date, scraped_date) >= ?
-                            AND title IS NOT NULL
-                            AND LENGTH(title) > 10
-                            AND quality_score IS NOT NULL
-                            ORDER BY quality_score DESC, word_count DESC, published_date DESC
-                            LIMIT 15
-                        """
-
-                        popular_df = pd.read_sql_query(popular_query, conn, params=[cutoff_time.isoformat()])
-                        conn.close()
-                        return popular_df
-
-                    except Exception as e:
-                        st.error(f"Error loading popular stories: {e}")
-                        return pd.DataFrame()
-
-                popular_stories = get_popular_stories(timeline_hours)
-
-                if not popular_stories.empty:
-                    for i, (_, story) in enumerate(popular_stories.iterrows(), 1):
-                        title = story['title']
-                        source = story['source_site'].replace('_', ' ').title()
-                        url = story.get('url', '#')
-                        quality = story.get('quality_score', 0)
-                        word_count = story.get('word_count', 0)
-                        sentiment = story.get('sentiment_score', 0) or 0
-
-                        # Quality and sentiment indicators
-                        quality_stars = "⭐" * min(int(quality * 5), 5)
-                        sentiment_emoji = "📈" if sentiment > 0.1 else "📉" if sentiment < -0.1 else "📊"
-
-                        with st.expander(f"{i}. {title}", expanded=False):
-                            st.markdown(f"""
-                            🏆 **Quality:** {quality_stars} ({quality:.2f})
-                            {sentiment_emoji} **Sentiment:** {sentiment:.2f}
-                            📝 **Length:** {word_count} words
-                            📰 **Source:** {source}
-
-                            🔗 [Read Article]({url})
-                            """)
-                else:
-                    st.info("No popular stories available for this time period")
-
-        # Add prominent "Latest Articles" section to main content area
-        st.markdown("---")
-        st.subheader(f"📰 Latest Articles ({time_range})")
+        # Add prominent "Latest Articles" section still within main_col
+        with main_col:
+            st.markdown("---")
+            st.subheader(f"📰 Latest Articles ({time_range})")
 
         try:
             conn = sqlite3.connect('nepal_news_intelligence.db')
