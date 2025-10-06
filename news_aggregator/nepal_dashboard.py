@@ -1089,7 +1089,7 @@ def create_narrative_correlation_heatmap():
                 xaxis=dict(tickangle=45)
             )
 
-            st.plotly_chart(fig1, width='stretch')
+            st.plotly_chart(fig1, use_container_width=True)
 
         with col2:
             # Source correlation heatmap
@@ -1111,7 +1111,7 @@ def create_narrative_correlation_heatmap():
                 xaxis=dict(tickangle=45)
             )
 
-            st.plotly_chart(fig2, width='stretch')
+            st.plotly_chart(fig2, use_container_width=True)
 
         # Analysis insights
         st.markdown("### 📊 Narrative Analysis Insights")
@@ -1289,7 +1289,7 @@ def create_political_party_histogram():
                 color_continuous_scale='viridis'
             )
             fig.update_layout(showlegend=False, height=400)
-            st.plotly_chart(fig, width='stretch')
+            st.plotly_chart(fig, use_container_width=True)
 
         with col2:
             # Top parties summary
@@ -1337,7 +1337,7 @@ def create_political_party_histogram():
                     labels={'color': '% of Articles'}
                 )
                 fig_heatmap.update_layout(height=400)
-                st.plotly_chart(fig_heatmap, width='stretch')
+                st.plotly_chart(fig_heatmap, use_container_width=True)
 
     except Exception as e:
         st.error(f"Error creating political party histogram: {e}")
@@ -1622,7 +1622,7 @@ def main():
             if timeline_stories:
                 timeline_fig = create_story_timeline(timeline_stories, selected_time_bin)
                 if timeline_fig:
-                    st.plotly_chart(timeline_fig, width='stretch')
+                    st.plotly_chart(timeline_fig, use_container_width=True)
             else:
                 # Instead of empty message, show recent activity overview
                 st.markdown("### 🔥 Trending Leaders & Topics (Last 24H)")
@@ -1763,7 +1763,7 @@ def main():
                             col1, col2 = st.columns([3, 2])
 
                             with col1:
-                                st.plotly_chart(fig_trending, width='stretch')
+                                st.plotly_chart(fig_trending, use_container_width=True)
 
                             with col2:
                                 st.markdown("#### 📈 Quick Stats")
@@ -2408,7 +2408,7 @@ def main():
                                 font=dict(size=10)
                             )
 
-                            st.plotly_chart(fig_topics, width='stretch')
+                            st.plotly_chart(fig_topics, use_container_width=True)
 
             except Exception as e:
                 st.error(f"Unable to load story analysis: {e}")
@@ -2453,7 +2453,7 @@ def main():
                     showlegend=False,
                     xaxis={'tickangle': 45}
                 )
-                st.plotly_chart(fig_influence, width='stretch')
+                st.plotly_chart(fig_influence, use_container_width=True)
 
             with col2:
                 fig_engagement = px.bar(
@@ -2469,7 +2469,7 @@ def main():
                     showlegend=False,
                     xaxis={'tickangle': 45}
                 )
-                st.plotly_chart(fig_engagement, width='stretch')
+                st.plotly_chart(fig_engagement, use_container_width=True)
 
             # Detailed table for those who want full data
             with st.expander("📋 Detailed Performance Data"):
@@ -2488,7 +2488,7 @@ def main():
                     'origination_rate': 'Origination Rate %'
                 }
                 performance_df.columns = [col_names.get(col, col) for col in available_cols]
-                st.dataframe(performance_df, width='stretch')
+                st.dataframe(performance_df, use_container_width=True)
         else:
             st.info("No source influence data available")
 
