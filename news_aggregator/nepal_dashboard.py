@@ -21,15 +21,8 @@ import random
 
 # Import our custom modules
 from realtime_analytics_engine import NewsIntelligenceEngine
+from twitter_integration import TwitterNewsIntelligence
 from nepal_news_intelligence_config import NEPAL_NEWS_SOURCES, DashboardConfig
-
-# Import Twitter integration (optional)
-try:
-    from twitter_integration import TwitterNewsIntelligence
-    TWITTER_AVAILABLE = True
-except ImportError:
-    TWITTER_AVAILABLE = False
-    print("⚠️ Twitter integration not available (tweepy not installed)")
 
 # Import enhanced word cloud processor
 try:
@@ -137,69 +130,12 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# Database initialization
-@st.cache_resource
-def ensure_database_populated():
-    """Ensure database has data, run collector if needed"""
-    import os
-    import subprocess
-
-    db_path = "nepal_news_intelligence.db"
-
-    # Check if database exists and has recent data
-    try:
-        conn = sqlite3.connect(db_path)
-        cursor = conn.cursor()
-
-        # Check latest article date
-        cursor.execute("""
-            SELECT MAX(COALESCE(published_date, scraped_date)) as latest_date,
-                   COUNT(*) as total_articles
-            FROM articles_enhanced
-        """)
-        result = cursor.fetchone()
-        conn.close()
-
-        if result and result[1] > 0:
-            latest_date = result[0]
-            total_articles = result[1]
-
-            # Check if data is from today or yesterday
-            if latest_date:
-                latest_dt = datetime.fromisoformat(latest_date.replace('Z', '+00:00'))
-                hours_old = (datetime.now() - latest_dt).total_seconds() / 3600
-
-                if hours_old < 48:  # Data is recent enough
-                    return f"Database OK: {total_articles} articles, latest {hours_old:.0f}h ago"
-
-        # Database is empty or outdated, run collector
-        st.info("🔄 Database outdated, collecting fresh articles...")
-
-        # Run collector script
-        collector_path = os.path.join(os.path.dirname(__file__), "comprehensive_rss_collector.py")
-        if os.path.exists(collector_path):
-            result = subprocess.run(
-                ["python", collector_path],
-                capture_output=True,
-                text=True,
-                timeout=120
-            )
-            return f"Collected fresh articles: {result.returncode == 0}"
-        else:
-            return "Collector script not found"
-
-    except Exception as e:
-        return f"Database check failed: {str(e)}"
-
 # Initialize analytics engines
 @st.cache_resource
 def initialize_engines():
     """Initialize analytics engines with caching"""
-    # Ensure database is populated first
-    db_status = ensure_database_populated()
-
     analytics_engine = NewsIntelligenceEngine()
-    twitter_engine = TwitterNewsIntelligence() if TWITTER_AVAILABLE else None
+    twitter_engine = TwitterNewsIntelligence()
     return analytics_engine, twitter_engine
 
 def create_metric_card(title: str, value: str, delta: str = None, icon: str = "📊") -> str:
@@ -1146,7 +1082,7 @@ def create_narrative_correlation_heatmap():
                 xaxis=dict(tickangle=45)
             )
 
-            st.plotly_chart(fig1, use_container_width=True)
+            st.plotly_chart(fig1, width='stretch')
 
         with col2:
             # Source correlation heatmap
@@ -1168,7 +1104,7 @@ def create_narrative_correlation_heatmap():
                 xaxis=dict(tickangle=45)
             )
 
-            st.plotly_chart(fig2, use_container_width=True)
+            st.plotly_chart(fig2, width='stretch')
 
         # Analysis insights
         st.markdown("### 📊 Narrative Analysis Insights")
@@ -1346,7 +1282,7 @@ def create_political_party_histogram():
                 color_continuous_scale='viridis'
             )
             fig.update_layout(showlegend=False, height=400)
-            st.plotly_chart(fig, use_container_width=True)
+            st.plotly_chart(fig, width='stretch')
 
         with col2:
             # Top parties summary
@@ -1394,7 +1330,7 @@ def create_political_party_histogram():
                     labels={'color': '% of Articles'}
                 )
                 fig_heatmap.update_layout(height=400)
-                st.plotly_chart(fig_heatmap, use_container_width=True)
+                st.plotly_chart(fig_heatmap, width='stretch')
 
     except Exception as e:
         st.error(f"Error creating political party histogram: {e}")
@@ -1679,20 +1615,19 @@ def main():
             if timeline_stories:
                 timeline_fig = create_story_timeline(timeline_stories, selected_time_bin)
                 if timeline_fig:
-                    st.plotly_chart(timeline_fig, use_container_width=True)
+                    st.plotly_chart(timeline_fig, width='stretch')
             else:
                 # Instead of empty message, show recent activity overview
-                time_label = {'1H': 'Last Hour', '6H': 'Last 6 Hours', '1D': 'Last 24 Hours', '1W': 'Last Week'}[selected_time_bin]
-                st.markdown(f"### 🔥 Trending Leaders & Topics ({time_label})")
+                st.markdown("### 🔥 Trending Leaders & Topics (Last 24H)")
 
                 try:
                     conn = sqlite3.connect('nepal_news_intelligence.db')
                     # Search for leader names and trending topics with available scores and URLs
-                    trending_df = pd.read_sql_query(f"""
+                    trending_df = pd.read_sql_query("""
                         SELECT title, content, published_date, source_site, url,
                                quality_score, sentiment_score, emotion
                         FROM articles_enhanced
-                        WHERE COALESCE(published_date, scraped_date) >= datetime('now', '-{timeline_hours} hours')
+                        WHERE COALESCE(published_date, scraped_date) >= datetime('now', '-24 hours')
                         AND (title IS NOT NULL OR content IS NOT NULL)
                         ORDER BY published_date DESC
                         LIMIT 1000
@@ -1821,7 +1756,7 @@ def main():
                             col1, col2 = st.columns([3, 2])
 
                             with col1:
-                                st.plotly_chart(fig_trending, use_container_width=True)
+                                st.plotly_chart(fig_trending, width='stretch')
 
                             with col2:
                                 st.markdown("#### 📈 Quick Stats")
@@ -2466,7 +2401,7 @@ def main():
                                 font=dict(size=10)
                             )
 
-                            st.plotly_chart(fig_topics, use_container_width=True)
+                            st.plotly_chart(fig_topics, width='stretch')
 
             except Exception as e:
                 st.error(f"Unable to load story analysis: {e}")
@@ -2511,7 +2446,7 @@ def main():
                     showlegend=False,
                     xaxis={'tickangle': 45}
                 )
-                st.plotly_chart(fig_influence, use_container_width=True)
+                st.plotly_chart(fig_influence, width='stretch')
 
             with col2:
                 fig_engagement = px.bar(
@@ -2527,7 +2462,7 @@ def main():
                     showlegend=False,
                     xaxis={'tickangle': 45}
                 )
-                st.plotly_chart(fig_engagement, use_container_width=True)
+                st.plotly_chart(fig_engagement, width='stretch')
 
             # Detailed table for those who want full data
             with st.expander("📋 Detailed Performance Data"):
@@ -2546,7 +2481,7 @@ def main():
                     'origination_rate': 'Origination Rate %'
                 }
                 performance_df.columns = [col_names.get(col, col) for col in available_cols]
-                st.dataframe(performance_df, use_container_width=True)
+                st.dataframe(performance_df, width='stretch')
         else:
             st.info("No source influence data available")
 
