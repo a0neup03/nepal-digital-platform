@@ -1594,16 +1594,16 @@ def main():
         main_col, viz_col = st.columns([3, 2])
 
         with main_col:
-            # Radio buttons for time selection at top
-            st.write("**⏰ Timeline View:**")
-            selected_time_bin = st.radio(
-                "",
-                options=['1H', '6H', '1D', '1W'],
-                format_func=lambda x: {'1H': '📅 Hourly', '6H': '🕕 6-Hour', '1D': '📆 Daily', '1W': '📊 Weekly'}[x],
-                index=2,  # Default to Daily
-                horizontal=True,
-                label_visibility="collapsed"
-            )
+            # Minimal time selector (Apple style - subtle, top-right feel)
+            time_col1, time_col2 = st.columns([4, 1])
+            with time_col2:
+                selected_time_bin = st.selectbox(
+                    "",
+                    options=['1H', '6H', '1D', '1W'],
+                    format_func=lambda x: {'1H': 'Hourly', '6H': '6 Hours', '1D': 'Daily', '1W': 'Weekly'}[x],
+                    index=2,
+                    label_visibility="collapsed"
+                )
 
             # Connect timeline selection to story detection
             timeline_hours_map = {'1H': 1, '6H': 6, '1D': 24, '1W': 168}
@@ -1612,60 +1612,116 @@ def main():
             # Regenerate stories for timeline view with caching
             timeline_stories = get_cached_trending_stories(timeline_hours)
 
-            # ===== TRENDING STORIES LIST FIRST (AT TOP) =====
-            st.markdown("---")
-            st.markdown("### 🔥 Trending Topics")
+            # ===== APPLE-STYLE HERO STORIES (TOP 3) =====
+            if timeline_stories and len(timeline_stories) > 0:
+                # Hero headline
+                st.markdown("""
+                <div style="margin: 2rem 0 1.5rem 0;">
+                    <h2 style="font-size: 2rem; font-weight: 600; color: #1d1d1f; margin: 0; letter-spacing: -0.02em;">
+                        Today's Top Stories
+                    </h2>
+                    <p style="color: #86868b; font-size: 0.95rem; margin-top: 0.25rem;">
+                        The most important news, updated continuously
+                    </p>
+                </div>
+                """, unsafe_allow_html=True)
 
-            if timeline_stories:
-                # Show trending stories in clean expandable cards
-                for i, story in enumerate(timeline_stories[:20], 1):  # Show top 20 stories
+                # Top 3 as large hero cards (Apple News style)
+                for i, story in enumerate(timeline_stories[:3], 1):
                     article_url = story.get('articles', [{}])[0].get('url', '#') if story.get('articles') else '#'
                     full_title = story['title']
                     article_count = story.get('article_count', 0)
                     source_count = story.get('source_count', 0)
-                    velocity = story.get('velocity', 0)
-                    story_articles = story.get('articles', [])
+                    first_article = story.get('articles', [{}])[0] if story.get('articles') else {}
+                    source_name = first_article.get('source_site', 'Unknown').replace('_', ' ').title()
+                    published_time = first_article.get('published_date', '')[:16] if first_article.get('published_date') else ''
 
-                    # Trending intensity indicators
-                    fire_intensity = "🔥🔥🔥🔥🔥" if article_count >= 5 else "🔥🔥🔥🔥" if article_count >= 4 else "🔥🔥🔥" if article_count >= 3 else "🔥🔥" if article_count >= 2 else "🔥"
-                    velocity_emoji = "🚀" if velocity > 2 else "⚡" if velocity > 1 else "📈"
+                    # Clean card with Apple aesthetics
+                    st.markdown(f"""
+                    <a href="{article_url if article_url != '#' else 'javascript:void(0)'}" target="_blank" style="text-decoration: none; color: inherit;">
+                        <div style="
+                            background: white;
+                            border-radius: 12px;
+                            padding: 1.75rem;
+                            margin-bottom: 1.25rem;
+                            border: 1px solid #e5e5e7;
+                            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                            cursor: pointer;
+                        " onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 12px 24px rgba(0,0,0,0.08)'; this.style.borderColor='#d2d2d7';"
+                           onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'; this.style.borderColor='#e5e5e7';">
 
-                    # Compact card design
-                    with st.expander(f"{i}. {full_title}", expanded=(i <= 5)):  # First 5 expanded
+                            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem;">
+                                <span style="font-size: 0.8rem; color: #86868b; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em;">{source_name}</span>
+                                <span style="color: #d2d2d7;">•</span>
+                                <span style="font-size: 0.8rem; color: #86868b;">{published_time}</span>
+                                <span style="margin-left: auto; background: #f5f5f7; padding: 0.25rem 0.75rem; border-radius: 12px; font-size: 0.75rem; color: #1d1d1f; font-weight: 500;">{article_count} sources</span>
+                            </div>
+
+                            <h3 style="
+                                font-size: 1.5rem;
+                                font-weight: 600;
+                                color: #1d1d1f;
+                                line-height: 1.3;
+                                margin: 0;
+                                letter-spacing: -0.01em;
+                            ">{full_title}</h3>
+
+                            <div style="margin-top: 0.75rem; display: flex; align-items: center; gap: 0.5rem; color: #0071e3;">
+                                <span style="font-size: 0.9rem; font-weight: 500;">Read more</span>
+                                <span style="font-size: 1rem;">→</span>
+                            </div>
+                        </div>
+                    </a>
+                    """, unsafe_allow_html=True)
+
+                # Remaining stories as clean compact list
+                if len(timeline_stories) > 3:
+                    st.markdown("""
+                    <div style="margin: 2.5rem 0 1rem 0;">
+                        <h3 style="font-size: 1.25rem; font-weight: 600; color: #1d1d1f; margin: 0;">
+                            More Stories
+                        </h3>
+                    </div>
+                    """, unsafe_allow_html=True)
+
+                    for i, story in enumerate(timeline_stories[3:20], 4):
+                        article_url = story.get('articles', [{}])[0].get('url', '#') if story.get('articles') else '#'
+                        full_title = story['title']
+                        first_article = story.get('articles', [{}])[0] if story.get('articles') else {}
+                        source_name = first_article.get('source_site', 'Unknown').replace('_', ' ').title()
+                        published_time = first_article.get('published_date', '')[:10] if first_article.get('published_date') else ''
+
                         st.markdown(f"""
-                        🔥 **Trending:** {fire_intensity} ({article_count} articles)
-                        {velocity_emoji} **Velocity:** {velocity:.1f} articles/hour
-                        📡 **Sources:** {source_count} news outlets
-                        📰 **Topic Coverage:** Multi-source story
-                        """)
+                        <a href="{article_url if article_url != '#' else 'javascript:void(0)'}" target="_blank" style="text-decoration: none; color: inherit;">
+                            <div style="
+                                padding: 1rem 0;
+                                border-bottom: 1px solid #f5f5f7;
+                                transition: background-color 0.2s ease;
+                            " onmouseover="this.style.backgroundColor='#f9f9f9';" onmouseout="this.style.backgroundColor='transparent';">
+                                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                                    <span style="font-size: 0.75rem; color: #86868b; font-weight: 500;">{source_name}</span>
+                                    <span style="color: #d2d2d7; font-size: 0.7rem;">•</span>
+                                    <span style="font-size: 0.75rem; color: #86868b;">{published_time}</span>
+                                </div>
+                                <h4 style="
+                                    font-size: 1.05rem;
+                                    font-weight: 500;
+                                    color: #1d1d1f;
+                                    line-height: 1.4;
+                                    margin: 0;
+                                ">{full_title}</h4>
+                            </div>
+                        </a>
+                        """, unsafe_allow_html=True)
 
-                        if len(story_articles) > 0:
-                            st.markdown("**📋 Related Articles:**")
-                            for j, article in enumerate(story_articles[:5], 1):
-                                article_title = article.get('title', 'No title')
-                                article_source = article.get('source_site', 'Unknown').replace('_', ' ').title()
-                                article_url_item = article.get('url', '')
-
-                                if article_url_item and str(article_url_item).startswith('http'):
-                                    st.markdown(f"   {j}. [{article_title[:100]}...]({article_url_item}) - *{article_source}*")
-                                else:
-                                    st.markdown(f"   {j}. {article_title[:100]}... - *{article_source}*")
-
-                            if len(story_articles) > 5:
-                                st.markdown(f"   *...and {len(story_articles) - 5} more articles*")
-
-                            # Main article link
-                            if article_url and str(article_url).startswith('http'):
-                                st.markdown(f"🔗 [**Read Main Article**]({article_url})")
-
-            # ===== STORY TIMELINE VISUALIZATION BELOW =====
-            st.markdown("---")
-            st.markdown("### 📊 Story Timeline Visualization")
-
-            if timeline_stories:
-                timeline_fig = create_story_timeline(timeline_stories, selected_time_bin)
-                if timeline_fig:
-                    st.plotly_chart(timeline_fig, use_container_width=True)
+            # ===== STORY TIMELINE VISUALIZATION (Collapsible for clean look) =====
+            with st.expander("📊 View Timeline Visualization", expanded=False):
+                if timeline_stories:
+                    timeline_fig = create_story_timeline(timeline_stories, selected_time_bin)
+                    if timeline_fig:
+                        st.plotly_chart(timeline_fig, use_container_width=True)
+                else:
+                    st.info("No timeline data available for selected period")
             else:
                 # Instead of empty message, show recent activity overview
                 st.markdown("### 🔥 Trending Leaders & Topics (Last 24H)")
@@ -1943,147 +1999,7 @@ def main():
                     except Exception as fallback_error:
                         st.error(f"Database connection issue: {fallback_error}")
 
-            # Optional: Show Popular Stories section at bottom of main column
-            st.markdown("---")
-            st.markdown("### 📈 Popular Stories (High Quality)")
-
-            # Get popular stories based on quality, word count, and recency
-            @st.cache_data(ttl=300)
-            def get_popular_stories(hours_back: int):
-                try:
-                    conn = sqlite3.connect('nepal_news_intelligence.db')
-                    cutoff_time = datetime.now() - timedelta(hours=hours_back)
-
-                    popular_query = """
-                        SELECT title, content, source_site, published_date, url,
-                               quality_score, sentiment_score, word_count, emotion
-                        FROM articles_enhanced
-                        WHERE COALESCE(published_date, scraped_date) >= ?
-                        AND title IS NOT NULL
-                        AND LENGTH(title) > 10
-                        AND quality_score IS NOT NULL
-                        ORDER BY quality_score DESC, word_count DESC, published_date DESC
-                        LIMIT 15
-                    """
-
-                    popular_df = pd.read_sql_query(popular_query, conn, params=[cutoff_time.isoformat()])
-                    conn.close()
-                    return popular_df
-
-                except Exception as e:
-                    st.error(f"Error loading popular stories: {e}")
-                    return pd.DataFrame()
-
-            popular_stories = get_popular_stories(timeline_hours)
-
-            if not popular_stories.empty:
-                for i, (_, story) in enumerate(popular_stories.iterrows(), 1):
-                    title = story['title']
-                    source = story['source_site'].replace('_', ' ').title()
-                    url = story.get('url', '#')
-                    quality = story.get('quality_score', 0)
-                    word_count = story.get('word_count', 0)
-                    sentiment = story.get('sentiment_score', 0) or 0
-
-                    # Quality and sentiment indicators
-                    quality_stars = "⭐" * min(int(quality * 5), 5)
-                    sentiment_emoji = "📈" if sentiment > 0.1 else "📉" if sentiment < -0.1 else "📊"
-
-                    with st.expander(f"{i}. {title}", expanded=False):
-                        st.markdown(f"""
-                        🏆 **Quality:** {quality_stars} ({quality:.2f})
-                        {sentiment_emoji} **Sentiment:** {sentiment:.2f}
-                        📝 **Length:** {word_count} words
-                        📰 **Source:** {source}
-
-                        🔗 [Read Article]({url})
-                        """)
-            else:
-                st.info("No popular stories available for this time period")
-
-        # Add prominent "Latest Articles" section still within main_col
-        with main_col:
-            st.markdown("---")
-            st.subheader(f"📰 Latest Articles ({time_range})")
-
-        try:
-            conn = sqlite3.connect('nepal_news_intelligence.db')
-            # Use the same time filtering as the dashboard metrics
-            cutoff_time = datetime.now() - timedelta(hours=selected_hours)
-
-            latest_articles_query = """
-                SELECT title, content, source_site, published_date, url,
-                       quality_score, sentiment_score, emotion
-                FROM articles_enhanced
-                WHERE COALESCE(published_date, scraped_date) >= ?
-                AND title IS NOT NULL
-                AND LENGTH(title) > 10
-                ORDER BY published_date DESC
-                LIMIT 10
-            """
-
-            articles_df = pd.read_sql_query(latest_articles_query, conn, params=[cutoff_time.isoformat()])
-            conn.close()
-
-            if not articles_df.empty:
-                # Display articles in a more prominent card format
-                for i, (_, article) in enumerate(articles_df.iterrows(), 1):
-                    title = article.get('title', 'No title')
-                    source = article.get('source_site', 'Unknown').replace('_', ' ').title()
-                    url = article.get('url', '')
-                    date = article.get('published_date', '')[:16] if article.get('published_date') else ''
-                    sentiment = article.get('sentiment_score', 0)
-                    if sentiment is None:
-                        sentiment = 0
-                    content_preview = article.get('content', '')[:150] + "..." if article.get('content') else ""
-
-                    # Sentiment emoji
-                    sentiment_emoji = "📈" if sentiment > 0.1 else "📉" if sentiment < -0.1 else "📊"
-
-                    # Create article card
-                    with st.container():
-                        st.markdown(f"""
-                        <div style="
-                            border: 1px solid #e0e0e0;
-                            border-radius: 8px;
-                            padding: 16px;
-                            margin: 8px 0;
-                            background: linear-gradient(90deg, #f8f9ff 0%, #ffffff 100%);
-                        ">
-                            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
-                                <div style="flex: 1;">
-                                    <h4 style="margin: 0; color: #1f77b4; font-size: 16px;">
-                                        {sentiment_emoji} {title}
-                                    </h4>
-                                </div>
-                                <div style="text-align: right; font-size: 12px; color: #666; margin-left: 16px;">
-                                    <div><strong>{source}</strong></div>
-                                    <div>{date}</div>
-                                </div>
-                            </div>
-                            <div style="color: #555; font-size: 14px; margin-bottom: 8px;">
-                                {content_preview}
-                            </div>
-                            <div style="display: flex; justify-content: space-between; align-items: center;">
-                                <div style="font-size: 12px; color: #888;">
-                                    Quality: {article.get('quality_score', 'N/A')} |
-                                    Sentiment: {sentiment:.2f} |
-                                    Emotion: {article.get('emotion', 'N/A')}
-                                </div>
-                                <div>
-                                    {f'<a href="{url}" target="_blank" style="color: #1f77b4; text-decoration: none;">🔗 Read Full Article</a>' if url and str(url).startswith('http') else ''}
-                                </div>
-                            </div>
-                        </div>
-                        """, unsafe_allow_html=True)
-
-                if len(articles_df) == 10:
-                    st.info(f"📊 Showing latest 10 articles from {time_range.lower()}. Use the 📈 Trending Stories tab for more detailed analysis.")
-            else:
-                st.info(f"No articles found in the selected time range ({time_range}). Try selecting a longer time period or check if fresh articles are being collected.")
-
-        except Exception as e:
-            st.error(f"Error loading articles: {e}")
+            # End of main_col content - Apple-style clean layout complete
 
         # RIGHT SIDEBAR: KEY VISUALIZATIONS
         with viz_col:
