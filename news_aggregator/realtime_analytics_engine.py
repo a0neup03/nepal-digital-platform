@@ -656,29 +656,32 @@ class NewsIntelligenceEngine:
 
             # OPTIMIZED DBSCAN parameters based on distance matrix analysis
             # Distance matrix analysis shows range [0.000, 2.856] with mean ~0.340
-            # Need stricter eps to prevent over-clustering
+            # Balanced approach: looser for small datasets, stricter for large ones
             if len(df_filtered) <= 10:
                 min_samples = 2
-                eps = 0.25  # Stricter for small datasets
+                eps = 0.40  # More lenient for very small datasets
+            elif len(df_filtered) <= 25:
+                min_samples = 2
+                eps = 0.35  # Balanced for small-medium datasets (16 articles case)
             elif len(df_filtered) <= 50:
                 min_samples = 2
-                eps = 0.20  # Much stricter for medium datasets (was 0.55)
+                eps = 0.28  # Moderate for medium datasets
             elif len(df_filtered) <= 100:
                 min_samples = 2
-                eps = 0.18  # Stricter for larger datasets (was 0.5)
+                eps = 0.22  # Stricter for larger datasets
             else:
                 min_samples = max(2, len(df_filtered) // 40)  # Slightly higher min_samples
-                eps = 0.15  # Much stricter for very large datasets (was 0.45)
+                eps = 0.18  # Strictest for very large datasets
 
             # Apply DBSCAN clustering
             from sklearn.cluster import DBSCAN
             clustering = DBSCAN(eps=eps, min_samples=min_samples, metric='precomputed')
             cluster_labels = clustering.fit_predict(distance_matrix)
 
-            # Handle single large cluster by refining
+            # Handle single large cluster by refining (more conservative adjustment)
             unique_clusters = set(cluster_labels[cluster_labels != -1])
-            if len(unique_clusters) == 1 and len(df_filtered) > 10:
-                eps = eps * 0.7
+            if len(unique_clusters) == 1 and len(df_filtered) > 15:
+                eps = eps * 0.80  # Less aggressive reduction (was 0.70)
                 clustering = DBSCAN(eps=eps, min_samples=min_samples, metric='precomputed')
                 cluster_labels = clustering.fit_predict(distance_matrix)
 
