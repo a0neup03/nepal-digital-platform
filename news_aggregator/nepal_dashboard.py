@@ -1694,14 +1694,13 @@ def main():
                         </a>
                         """, unsafe_allow_html=True)
 
-            # ===== STORY TIMELINE VISUALIZATION (Collapsible for clean look) =====
-            with st.expander("📊 View Timeline Visualization", expanded=False):
-                if timeline_stories:
+                # ===== STORY TIMELINE VISUALIZATION (Collapsible for clean look) =====
+                with st.expander("📊 View Timeline Visualization", expanded=False):
                     timeline_fig = create_story_timeline(timeline_stories, selected_time_bin)
                     if timeline_fig:
                         st.plotly_chart(timeline_fig, use_container_width=True)
-                else:
-                    st.info("No timeline data available for selected period")
+                    else:
+                        st.info("No timeline data available")
 
             # Fallback section if no trending stories - Show recent articles instead
             else:
