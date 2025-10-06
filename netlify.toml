@@ -1,0 +1,18 @@
+[build]
+  # Static site only - no build needed
+  command = "echo 'No build required'"
+  publish = "."
+  ignore = "/bin/false"  # Always build (don't ignore)
+
+[build.environment]
+  # Disable Python detection
+  PYTHON_VERSION = ""
+
+# Don't process Python files
+[[plugins]]
+  package = "@netlify/plugin-sitemap"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

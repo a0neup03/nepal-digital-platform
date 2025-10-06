@@ -1,0 +1,2 @@
+# Disable Python runtime detection
+# This is a static HTML site only
