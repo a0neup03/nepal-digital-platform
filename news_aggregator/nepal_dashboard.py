@@ -137,10 +137,67 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
+# Database initialization
+@st.cache_resource
+def ensure_database_populated():
+    """Ensure database has data, run collector if needed"""
+    import os
+    import subprocess
+
+    db_path = "nepal_news_intelligence.db"
+
+    # Check if database exists and has recent data
+    try:
+        conn = sqlite3.connect(db_path)
+        cursor = conn.cursor()
+
+        # Check latest article date
+        cursor.execute("""
+            SELECT MAX(COALESCE(published_date, scraped_date)) as latest_date,
+                   COUNT(*) as total_articles
+            FROM articles_enhanced
+        """)
+        result = cursor.fetchone()
+        conn.close()
+
+        if result and result[1] > 0:
+            latest_date = result[0]
+            total_articles = result[1]
+
+            # Check if data is from today or yesterday
+            if latest_date:
+                latest_dt = datetime.fromisoformat(latest_date.replace('Z', '+00:00'))
+                hours_old = (datetime.now() - latest_dt).total_seconds() / 3600
+
+                if hours_old < 48:  # Data is recent enough
+                    return f"Database OK: {total_articles} articles, latest {hours_old:.0f}h ago"
+
+        # Database is empty or outdated, run collector
+        st.info("🔄 Database outdated, collecting fresh articles...")
+
+        # Run collector script
+        collector_path = os.path.join(os.path.dirname(__file__), "comprehensive_rss_collector.py")
+        if os.path.exists(collector_path):
+            result = subprocess.run(
+                ["python", collector_path],
+                capture_output=True,
+                text=True,
+                timeout=120
+            )
+            return f"Collected fresh articles: {result.returncode == 0}"
+        else:
+            return "Collector script not found"
+
+    except Exception as e:
+        return f"Database check failed: {str(e)}"
+
 # Initialize analytics engines
 @st.cache_resource
 def initialize_engines():
     """Initialize analytics engines with caching"""
+    # Ensure database is populated first
+    db_status = ensure_database_populated()
+
     analytics_engine = NewsIntelligenceEngine()
     twitter_engine = TwitterNewsIntelligence() if TWITTER_AVAILABLE else None
     return analytics_engine, twitter_engine
