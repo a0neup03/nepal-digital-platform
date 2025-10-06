@@ -1625,16 +1625,17 @@ def main():
                     st.plotly_chart(timeline_fig, use_container_width=True)
             else:
                 # Instead of empty message, show recent activity overview
-                st.markdown("### 🔥 Trending Leaders & Topics (Last 24H)")
+                time_label = {'1H': 'Last Hour', '6H': 'Last 6 Hours', '1D': 'Last 24 Hours', '1W': 'Last Week'}[selected_time_bin]
+                st.markdown(f"### 🔥 Trending Leaders & Topics ({time_label})")
 
                 try:
                     conn = sqlite3.connect('nepal_news_intelligence.db')
                     # Search for leader names and trending topics with available scores and URLs
-                    trending_df = pd.read_sql_query("""
+                    trending_df = pd.read_sql_query(f"""
                         SELECT title, content, published_date, source_site, url,
                                quality_score, sentiment_score, emotion
                         FROM articles_enhanced
-                        WHERE COALESCE(published_date, scraped_date) >= datetime('now', '-24 hours')
+                        WHERE COALESCE(published_date, scraped_date) >= datetime('now', '-{timeline_hours} hours')
                         AND (title IS NOT NULL OR content IS NOT NULL)
                         ORDER BY published_date DESC
                         LIMIT 1000
