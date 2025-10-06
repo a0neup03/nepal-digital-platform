@@ -36,7 +36,33 @@
             transform: translateY(-2px);
             box-shadow: 0 10px 25px rgba(59, 130, 246, 0.3);
         }
+        .lang-ne { display: block; }
+        .lang-en { display: none; }
+        body.english .lang-ne { display: none; }
+        body.english .lang-en { display: block; }
     </style>
+    <script>
+        // Language toggle
+        function toggleLanguage() {
+            document.body.classList.toggle('english');
+            const btn = document.getElementById('langBtn');
+            if (document.body.classList.contains('english')) {
+                btn.textContent = 'नेपाली';
+                localStorage.setItem('language', 'en');
+            } else {
+                btn.textContent = 'English';
+                localStorage.setItem('language', 'ne');
+            }
+        }
+
+        // Load saved language preference
+        window.addEventListener('DOMContentLoaded', () => {
+            if (localStorage.getItem('language') === 'en') {
+                document.body.classList.add('english');
+                document.getElementById('langBtn').textContent = 'नेपाली';
+            }
+        });
+    </script>
 </head>
 <body class="bg-gray-50">
     <!-- Navigation -->
@@ -55,6 +81,9 @@
                 <div class="flex items-center space-x-6">
                     <a href="#tools" class="text-gray-600 hover:text-gray-900 text-sm font-medium transition">Tools</a>
                     <a href="about.html" class="text-gray-600 hover:text-gray-900 text-sm font-medium transition">About</a>
+                    <button id="langBtn" onclick="toggleLanguage()" class="text-gray-600 hover:text-gray-900 text-sm font-medium transition border border-gray-300 px-3 py-1 rounded">
+                        English
+                    </button>
                     <a href="#tools" class="btn-primary text-white px-6 py-2 rounded-lg text-sm font-medium">
                         Get Started
                     </a>
@@ -67,14 +96,13 @@
     <section class="hero-gradient text-white py-20">
         <div class="container mx-auto px-6 text-center">
             <div class="max-w-4xl mx-auto">
-                <h2 class="text-5xl md:text-6xl font-bold mb-6 nepali leading-tight">
-                    सूचना र शिक्षाको लागि डिजिटल उपकरणहरू
+                <h2 class="text-5xl md:text-6xl font-bold mb-6 leading-tight">
+                    <span class="lang-ne nepali">सूचना र शिक्षाको लागि डिजिटल उपकरणहरू</span>
+                    <span class="lang-en">Digital Tools for Information and Education</span>
                 </h2>
-                <p class="text-xl md:text-2xl text-blue-100 mb-4">
-                    Digital Tools for Information and Education
-                </p>
                 <p class="text-lg text-blue-200 max-w-2xl mx-auto mb-10 leading-relaxed">
-                    नेपालका लागि तीन मुख्य डिजिटल मञ्चहरू: समाचार विश्लेषण, सरकारी सेवा ट्र्याकिङ, र राजनीतिक शिक्षा
+                    <span class="lang-ne nepali">नेपालका लागि तीन मुख्य डिजिटल मञ्चहरू: समाचार विश्लेषण, सरकारी सेवा, र राजनीतिक शिक्षा</span>
+                    <span class="lang-en">Three digital platforms for Nepal: news analysis, government services, and political education</span>
                 </p>
                 <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
                     <a href="#tools" class="bg-white text-blue-900 px-8 py-3 rounded-lg font-semibold hover:bg-blue-50 transition shadow-lg">
@@ -92,8 +120,14 @@
     <section id="tools" class="py-20 bg-white">
         <div class="container mx-auto px-6">
             <div class="text-center mb-16">
-                <h3 class="text-4xl font-bold text-gray-900 mb-4 nepali">डिजिटल उपकरणहरू</h3>
-                <p class="text-xl text-gray-600">Three focused tools for different needs</p>
+                <h3 class="text-4xl font-bold text-gray-900 mb-4">
+                    <span class="lang-ne nepali">यहाँ के छ</span>
+                    <span class="lang-en">What's Here</span>
+                </h3>
+                <p class="text-xl text-gray-600">
+                    <span class="lang-ne nepali">विभिन्न आवश्यकताका लागि तीन मञ्चहरू</span>
+                    <span class="lang-en">Three focused platforms for different needs</span>
+                </p>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
