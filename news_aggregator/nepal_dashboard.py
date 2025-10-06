@@ -21,8 +21,15 @@ import random
 
 # Import our custom modules
 from realtime_analytics_engine import NewsIntelligenceEngine
-from twitter_integration import TwitterNewsIntelligence
 from nepal_news_intelligence_config import NEPAL_NEWS_SOURCES, DashboardConfig
+
+# Import Twitter integration (optional)
+try:
+    from twitter_integration import TwitterNewsIntelligence
+    TWITTER_AVAILABLE = True
+except ImportError:
+    TWITTER_AVAILABLE = False
+    print("⚠️ Twitter integration not available (tweepy not installed)")
 
 # Import enhanced word cloud processor
 try:
@@ -135,7 +142,7 @@ st.markdown("""
 def initialize_engines():
     """Initialize analytics engines with caching"""
     analytics_engine = NewsIntelligenceEngine()
-    twitter_engine = TwitterNewsIntelligence()
+    twitter_engine = TwitterNewsIntelligence() if TWITTER_AVAILABLE else None
     return analytics_engine, twitter_engine
 
 def create_metric_card(title: str, value: str, delta: str = None, icon: str = "📊") -> str:
