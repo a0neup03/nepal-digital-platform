@@ -1590,9 +1590,10 @@ def main():
     with tab1:
         st.subheader("🌟 आजका मुख्य कुराहरू | Today's Key Stories")
 
-        col1, col2 = st.columns([2, 1])
+        # NEW LAYOUT: Center content (trending news) + Right sidebar (visualizations)
+        main_col, viz_col = st.columns([3, 2])
 
-        with col1:
+        with main_col:
             # Radio buttons for easier time selection
             st.write("**⏰ Timeline View:**")
             selected_time_bin = st.radio(
@@ -1611,7 +1612,7 @@ def main():
             # Regenerate stories for timeline view with caching
             timeline_stories = get_cached_trending_stories(timeline_hours)
 
-            # Story timeline
+            # Story timeline plot (main visualization)
             if timeline_stories:
                 timeline_fig = create_story_timeline(timeline_stories, selected_time_bin)
                 if timeline_fig:
@@ -1893,7 +1894,10 @@ def main():
                     except Exception as fallback_error:
                         st.error(f"Database connection issue: {fallback_error}")
 
-        with col2:
+            # Now show trending stories list in center column
+            st.markdown("---")
+            st.markdown("### 🔥 Trending Topics")
+
             # Create tabs for different story types
             story_tab1, story_tab2 = st.tabs(["🔥 Trending", "📈 Popular"])
 
@@ -2140,6 +2144,42 @@ def main():
 
         except Exception as e:
             st.error(f"Error loading articles: {e}")
+
+        # RIGHT SIDEBAR: KEY VISUALIZATIONS
+        with viz_col:
+            st.markdown("### 📊 Intelligence Insights")
+
+            # Source Activity Heatmap & Correlation (user's "jewel")
+            with st.container():
+                st.markdown("#### 🔥 Source Activity & Patterns")
+                create_source_activity_heatmap()
+
+            st.markdown("---")
+
+            # Quick stats card
+            with st.container():
+                st.markdown("#### 📈 Quick Analytics")
+
+                # Get recent stats
+                try:
+                    conn = sqlite3.connect('nepal_news_intelligence.db')
+                    stats_query = """
+                        SELECT
+                            COUNT(DISTINCT source_site) as source_count,
+                            COUNT(*) as article_count,
+                            COUNT(DISTINCT DATE(published_date)) as active_days
+                        FROM articles_enhanced
+                        WHERE COALESCE(published_date, scraped_date) >= datetime('now', '-7 days')
+                    """
+                    stats = pd.read_sql_query(stats_query, conn).iloc[0]
+                    conn.close()
+
+                    st.metric("📰 Active Sources (7d)", f"{stats['source_count']}")
+                    st.metric("📝 Total Articles (7d)", f"{stats['article_count']:,}")
+                    st.metric("📅 Active Days", f"{stats['active_days']}")
+
+                except Exception as e:
+                    st.warning(f"Stats unavailable: {e}")
 
     with tab2:
         st.subheader("🔥 चर्चामा रहेका विषयहरू | What People Are Talking About")
