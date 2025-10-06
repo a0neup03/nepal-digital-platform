@@ -30,11 +30,15 @@ class TwitterNewsIntelligence:
 
     def setup_logging(self):
         """Setup logging for Twitter operations"""
+        # Create logs directory if it doesn't exist
+        log_dir = f'{os.path.dirname(__file__)}/logs'
+        os.makedirs(log_dir, exist_ok=True)
+
         logging.basicConfig(
             level=logging.INFO,
             format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
             handlers=[
-                logging.FileHandler(f'{os.path.dirname(__file__)}/logs/twitter_integration.log'),
+                logging.FileHandler(f'{log_dir}/twitter_integration.log'),
                 logging.StreamHandler()
             ]
         )
